@@ -5,6 +5,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { useCommunity } from "@/contexts/CommunityContext";
 import { useActivities } from "@/hooks/useActivityClubPostData";
 import { Calendar, Clock, MapPin, Plus, Dumbbell, Heart, Trophy, BookOpen, Gamepad2, Star } from "lucide-react";
+import { AdSlot } from "@/components/sponsor/AdSlot";
 
 const categoryIcons: Record<string, { icon: any; color: string; iconColor: string }> = {
   sports: { icon: Dumbbell, color: "bg-[hsl(155,45%,92%)]", iconColor: "text-[hsl(155,45%,32%)]" },
@@ -28,7 +29,7 @@ export default function Activities() {
         const style = categoryIcons[a.category?.toLowerCase()] || defaultStyle;
         const spots = (a.max_participants || 0) - (a.current_participants || 0);
         return {
-          id: a.id,
+          id: a._id,
           title: a.title,
           category: a.category || "Activity",
           time: a.date ? new Date(a.date).toLocaleDateString(undefined, { weekday: "short", month: "short" }) + " · " + new Date(a.date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "TBD",
@@ -51,7 +52,7 @@ export default function Activities() {
       <Reveal>
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground tracking-[-0.02em]">
+            <h1 className="text-2xl sm:text-3xl font-[Bricolage_Grotesque] font-extrabold text-foreground tracking-[-0.02em]">
               Activities
             </h1>
             <p className="text-muted-foreground mt-1">Discover and join activities in your community.</p>
@@ -64,12 +65,15 @@ export default function Activities() {
         </div>
       </Reveal>
 
+      {/* Ad placement */}
+      <AdSlot placement="activities_list" variant="banner" label="Sponsored" />
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {displayActivities.map((activity: any, i: number) => {
           const Icon = activity.icon;
           return (
-            <Reveal key={activity.id} delay={i * 0.05}>
-              <Link to={`/dashboard/activities/${activity.id}`}>
+            <Reveal key={activity._id} delay={i * 0.05}>
+              <Link to={`/dashboard/activities/${activity._id}`}>
                 <Card className="border-border/40 shadow-sm hover:shadow-md transition-all rounded-2xl overflow-hidden cursor-pointer group h-full">
                   <CardContent className="p-0">
                     <div className={`${activity.color} h-24 flex items-center justify-center`}>

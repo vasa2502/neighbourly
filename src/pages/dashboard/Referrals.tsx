@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Reveal } from "@/components/motion/Reveal";
 import { useReferrals, useCreateReferral } from "@/hooks/useMessagingData";
+import { useAuth } from "@/contexts/AuthContext";
 import { useProfile } from "@/hooks/useCommunityData";
 import { toast } from "sonner";
 import { ArrowLeft, Link as LinkIcon, Copy, Share2, Users, Gift, QrCode, ExternalLink, Mail, MessageCircle, CheckCircle } from "lucide-react";
@@ -24,6 +25,7 @@ export default function Referrals() {
   const [copied, setCopied] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const [showQR, setShowQR] = useState(false);
+  const { user } = useAuth();
   const { data: referrals = [] } = useReferrals();
   const { data: profile } = useProfile();
   const createReferral = useCreateReferral();
@@ -32,7 +34,7 @@ export default function Referrals() {
   const handleInvite = async () => {
     if (!inviteEmail.trim()) { toast.error("Enter an email"); return; }
     try {
-      await createReferral.mutateAsync({ referredEmail: inviteEmail });
+      await createReferral.mutateAsync({ referrerId: user?.id || "", referredEmail: inviteEmail });
       toast.success("Invitation sent!");
       setInviteEmail("");
     } catch (err: any) {
@@ -47,6 +49,29 @@ export default function Referrals() {
     navigator.clipboard.writeText(referralLink);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleShareEmail = () => {
+    const subject = encodeURIComponent("Join me on JOINN!");
+    const body = encodeURIComponent(`Hey! I'd like to invite you to join my residential community on JOINN. It's a great way to connect with neighbors, discover activities, and be part of a verified community.\n\nUse my referral link to join: ${referralLink}`);
+    window.open(`mailto:?subject=${subject}&body=${body}`, "_blank");
+  };
+
+  const handleShareWhatsApp = () => {
+    const text = encodeURIComponent(`Hey! Join me on JOINN — a private community platform for our residential area. Use my link: ${referralLink}`);
+    window.open(`https://wa.me/?text=${text}`, "_blank");
+  };
+
+  const handleNativeShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: "Join me on JOINN",
+        text: "Join my residential community on JOINN!",
+        url: referralLink,
+      }).catch(() => {});
+    } else {
+      handleCopy();
+    }
   };
 
   return (
@@ -103,16 +128,16 @@ export default function Referrals() {
               </Button>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" className="flex-1 border-[hsl(155,35%,85%)] text-[hsl(155,35%,18%)]">
+              <Button variant="outline" className="flex-1 border-[hsl(155,35%,85%)] text-[hsl(155,35%,18%)]" onClick={handleShareEmail}>
                 <Mail className="w-4 h-4 mr-2" /> Email
               </Button>
-              <Button variant="outline" className="flex-1 border-[hsl(155,35%,85%)] text-[hsl(155,35%,18%)]">
+              <Button variant="outline" className="flex-1 border-[hsl(155,35%,85%)] text-[hsl(155,35%,18%)]" onClick={handleShareWhatsApp}>
                 <MessageCircle className="w-4 h-4 mr-2" /> WhatsApp
               </Button>
               <Button variant="outline" className="flex-1 border-[hsl(155,35%,85%)] text-[hsl(155,35%,18%)]" onClick={() => setShowQR(!showQR)}>
                 <QrCode className="w-4 h-4 mr-2" /> {showQR ? "Hide QR" : "QR Code"}
               </Button>
-              <Button variant="outline" className="flex-1 border-[hsl(155,35%,85%)] text-[hsl(155,35%,18%)]">
+              <Button variant="outline" className="flex-1 border-[hsl(155,35%,85%)] text-[hsl(155,35%,18%)]" onClick={handleNativeShare}>
                 <Share2 className="w-4 h-4 mr-2" /> Share
               </Button>
             </div>
@@ -181,7 +206,7 @@ export default function Referrals() {
               </div>
             ) : (
               referrals.map((ref: any, i: number) => (
-                <div key={ref.id || i} className="flex items-center justify-between p-3 rounded-xl bg-gray-50">
+                <div key={ref._id || i} className="flex items-center justify-between p-3 rounded-xl bg-gray-50">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-[hsl(155,45%,90%)] flex items-center justify-center font-semibold text-[hsl(155,45%,32%)]">
                       {(ref.referred_email || "?").charAt(0).toUpperCase()}

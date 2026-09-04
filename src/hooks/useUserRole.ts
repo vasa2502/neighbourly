@@ -1,7 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from "convex/react";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
 import { useCommunity } from "@/contexts/CommunityContext";
+import { api } from "../../convex/_generated/api";
 
 export type CommunityRole = "resident" | "founder" | "admin" | "moderator" | "host";
 
@@ -12,40 +12,33 @@ interface UserRoleInfo {
 }
 
 /**
- * Fetches the current user's role in the active community.
- * Returns the role info from community_memberships table.
+ * Fetches the current user's role in the active community from Convex.
  */
 export function useUserRole() {
   const { user } = useAuth();
   const { communityId } = useCommunity();
 
-  return useQuery<UserRoleInfo>({
-    queryKey: ["userRole", user?.id, communityId],
-    queryFn: async () => {
-      if (!user || !communityId) return { role: "resident", verified: false, verificationStatus: "none" };
+  const membership = useQuery(
+    api.memberships.getMembership,
+    user && communityId ? { userId: user.id, communityId } : "skip"
+  );
 
-      try {
-        const { data, error } = await supabase
-          .from("community_memberships" as any)
-          .select("role, verified, verification_status")
-          .eq("user_id", user.id)
-          .eq("community_id", communityId)
-          .single();
+  if (!user || !communityId) {
+    return { data: { role: "resident" as CommunityRole, verified: false, verificationStatus: "none" as const } };
+  }
 
-        if (error || !data) return { role: "resident", verified: false, verificationStatus: "none" };
+  if (membership === undefined) {
+    return { data: { role: "resident" as CommunityRole, verified: false, verificationStatus: "none" as const }, isLoading: true };
+  }
 
-        return {
-          role: (data as any).role as CommunityRole,
-          verified: (data as any).verified ?? false,
-          verificationStatus: (data as any).verification_status ?? "none",
-        };
-      } catch {
-        return { role: "resident", verified: false, verificationStatus: "none" };
-      }
+  return {
+    data: {
+      role: (membership?.role || "resident") as CommunityRole,
+      verified: membership?.verified ?? false,
+      verificationStatus: (membership?.verificationStatus || "none") as "none" | "pending" | "approved" | "rejected",
     },
-    enabled: !!user && !!communityId,
-    staleTime: 60_000,
-  });
+    isLoading: false,
+  };
 }
 
 /**

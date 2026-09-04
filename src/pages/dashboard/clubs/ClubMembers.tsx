@@ -14,7 +14,7 @@ export default function ClubMembers() {
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 pb-24 lg:pb-8 pt-4 lg:pt-6">
       <Reveal>
-        <h1 className="text-2xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-6">Club Members ({members.length})</h1>
+        <h1 className="text-2xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-6">Club Members ({members.length})</h1>
       </Reveal>
       <div className="space-y-2">
         {members.length === 0 && <p className="text-muted-foreground text-sm text-center py-8">No members yet.</p>}

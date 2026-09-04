@@ -55,7 +55,7 @@ export default function OnboardingPrivacy() {
                 </div>
               ))}
             </div>
-            <h1 className="text-2xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-2">Privacy settings</h1>
+            <h1 className="text-2xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-2">Privacy settings</h1>
             <p className="text-sm text-muted-foreground">Control what other residents can see about you. Your information is intentionally minimized.</p>
           </div>
         </Reveal>

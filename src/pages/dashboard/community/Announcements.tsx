@@ -23,18 +23,18 @@ export default function Announcements() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-24 lg:pb-8 pt-4 lg:pt-6">
       <Reveal>
-        <h1 className="text-2xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-6 flex items-center gap-3"><Megaphone className="w-6 h-6 text-[hsl(155,45%,32%)]" /> Announcements</h1>
+        <h1 className="text-2xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-6 flex items-center gap-3"><Megaphone className="w-6 h-6 text-[hsl(155,45%,32%)]" /> Announcements</h1>
       </Reveal>
       <div className="space-y-3">
         {(displayAnnouncements as any[]).map((a: any, i: number) => (
-          <Reveal key={a.id} delay={i * 0.05}>
+          <Reveal key={a._id} delay={i * 0.05}>
             <Card className="border-border/40 shadow-sm rounded-2xl hover:shadow-md transition-all cursor-pointer">
               <CardContent className="p-5">
                 <div className="flex items-center gap-2 mb-2">
                   {a.pinned && <span className="text-[9px] font-bold uppercase tracking-wider text-[hsl(38,65%,42%)] bg-[hsl(38,50%,92%)] px-1.5 py-0.5 rounded-full flex items-center gap-1"><Pin className="w-2.5 h-2.5" /> Pinned</span>}
                   <span className="text-[10px] text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" />{new Date(a.created_at).toLocaleDateString()}</span>
                 </div>
-                <h3 className="font-[Plus_Jakarta_Sans] font-bold text-foreground text-sm mb-1">{a.title}</h3>
+                <h3 className="font-[Bricolage_Grotesque] font-bold text-foreground text-sm mb-1">{a.title}</h3>
                 <p className="text-xs text-muted-foreground leading-relaxed">{a.content}</p>
               </CardContent>
             </Card>

@@ -4,10 +4,17 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Reveal } from "@/components/motion/Reveal";
-import { ArrowLeft, Check, Crown, Gift, Zap, Building2 } from "lucide-react";
+import { ArrowLeft, Check, Crown, Gift, Zap, Building2, Loader2, CreditCard, ExternalLink, XCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useSubscription } from "@/hooks/useMessagingData";
+import { useSubscription, useSubscriptionHistory } from "@/hooks/useMessagingData";
 import { useReferrals } from "@/hooks/useMessagingData";
+import {
+  useCreateCheckoutSession,
+  useManageSubscription,
+  useBillingPortal,
+  STRIPE_PRICES,
+} from "@/hooks/useStripeSubscription";
+import { toast } from "sonner";
 
 // ─── USD pricing (all marketing/display prices in USD) ───
 const USD_PRICES = {
@@ -101,6 +108,107 @@ const tierConfig = {
 
 type TierKey = keyof typeof tierConfig;
 
+/* ─── Subscribe Button Component ─── */
+function SubscribeButton({
+  selectedTier,
+  billing,
+  localFinalPrice,
+  localPrice,
+  isActive,
+}: {
+  selectedTier: TierKey;
+  billing: "monthly" | "annual";
+  localFinalPrice: string;
+  localPrice: string;
+  isActive: boolean;
+}) {
+  const createCheckout = useCreateCheckoutSession();
+  const billingPortal = useBillingPortal();
+
+  const stripeConfigured = !!STRIPE_PRICES.resident_plus_monthly;
+
+  const handleSubscribe = async () => {
+    if (!stripeConfigured) {
+      toast.info("Stripe is not configured yet. Please add your Stripe keys in Settings → Environment.");
+      return;
+    }
+
+    // Map tier + billing to the correct Stripe price ID
+    let priceId = "";
+    let tier = selectedTier;
+    if (selectedTier === "resident_plus") {
+      priceId = billing === "annual"
+        ? STRIPE_PRICES.resident_plus_annual
+        : STRIPE_PRICES.resident_plus_monthly;
+    } else if (selectedTier === "host_pro") {
+      priceId = STRIPE_PRICES.host_pro_monthly;
+    } else if (selectedTier === "community_partner") {
+      priceId = STRIPE_PRICES.community_partner_monthly;
+    }
+
+    if (!priceId) {
+      toast.error("No price configured for this plan. Please check your Stripe settings.");
+      return;
+    }
+
+    try {
+      await createCheckout.mutateAsync({ priceId, tier });
+    } catch {
+      // Error handled by the mutation's onError
+    }
+  };
+
+  const handleManageBilling = () => {
+    try {
+      billingPortal.mutate();
+    } catch {
+      // Error handled by the mutation's onError
+    }
+  };
+
+  if (isActive) {
+    return (
+      <div className="space-y-2">
+        <div className="flex items-center gap-2 p-3 rounded-xl bg-green-50 border border-green-200">
+          <Check className="w-4 h-4 text-green-600" />
+          <span className="text-sm font-medium text-green-800">You're subscribed!</span>
+        </div>
+        <Button
+          variant="outline"
+          className="w-full border-gray-200"
+          onClick={handleManageBilling}
+          disabled={billingPortal.isPending}
+        >
+          {billingPortal.isPending ? (
+            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+          ) : (
+            <CreditCard className="w-4 h-4 mr-2" />
+          )}
+          Manage Billing & Payment Methods
+          <ExternalLink className="w-3 h-3 ml-2 opacity-50" />
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <Button
+      className="w-full bg-[hsl(155,45%,32%)] text-white hover:bg-[hsl(155,45%,26%)] font-semibold rounded-full h-12"
+      onClick={handleSubscribe}
+      disabled={createCheckout.isPending}
+    >
+      {createCheckout.isPending ? (
+        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+      ) : (
+        <CreditCard className="w-4 h-4 mr-2" />
+      )}
+      {stripeConfigured
+        ? `Subscribe for ${localFinalPrice !== localPrice ? localFinalPrice : localPrice}`
+        : "Subscribe (Stripe not configured)"}
+    </Button>
+  );
+}
+
 export default function Subscription() {
   const navigate = useNavigate();
   const [billing, setBilling] = useState<"monthly" | "annual">("monthly");
@@ -108,7 +216,9 @@ export default function Subscription() {
   const [userRegion, setUserRegion] = useState("US");
 
   const { data: subscription } = useSubscription();
+  const { data: subHistory } = useSubscriptionHistory();
   const { data: referrals = [] } = useReferrals();
+  const manageSubscription = useManageSubscription();
 
   useEffect(() => {
     setUserRegion(detectUserRegion());
@@ -138,6 +248,23 @@ export default function Subscription() {
 
   const isActive = subscription?.status === "active";
   const TierIcon = tier.icon;
+
+  const handleCancelSubscription = async () => {
+    if (!confirm("Are you sure you want to cancel your subscription? You'll retain access until the end of the current billing period.")) return;
+    try {
+      await manageSubscription.mutateAsync({ action: "cancel" });
+    } catch {
+      // Error handled by the mutation
+    }
+  };
+
+  const handleReactivateSubscription = async () => {
+    try {
+      await manageSubscription.mutateAsync({ action: "reactivate" });
+    } catch {
+      // Error handled by the mutation
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto px-4 pb-24 lg:pb-8 py-8">
@@ -246,18 +373,19 @@ export default function Subscription() {
               ))}
             </div>
 
-            {/* Subscribe Button — shows local currency at checkout */}
-            <Button className="w-full h-12 bg-[hsl(155,45%,32%)] hover:bg-[hsl(155,50%,28%)] text-white text-base">
-              {selectedTier === "resident_plus"
-                ? `Subscribe — ${localFinalPrice}/${billing === "annual" ? "year" : "month"}`
-                : `Subscribe — ${localPrice}/month`
-              }
-            </Button>
+            {/* Subscribe Button — triggers Stripe Checkout */}
+            <SubscribeButton
+              selectedTier={selectedTier}
+              billing={billing}
+              localFinalPrice={localFinalPrice}
+              localPrice={localPrice}
+              isActive={isActive}
+            />
             <p className="text-xs text-center text-gray-400 mt-3">
-              {selectedTier === "resident_plus" && totalCreditsUSD > 0 && (
-                <>Prices shown in your local currency. USD ${usdPrice.toFixed(2)} {tier.hasAnnual && billing === "annual" ? `/year` : `/month`} base price. </>
-              )}
               Cancel anytime. {tier.hasAnnual ? `Billed ${billing === "monthly" ? "monthly" : "annually"}.` : "Billed monthly."}
+              {!STRIPE_PRICES.resident_plus_monthly && (
+                <> Stripe is not configured. Set Stripe keys in Settings to enable subscriptions.</>
+              )}
             </p>
           </CardContent>
         </Card>
@@ -281,17 +409,40 @@ export default function Subscription() {
                 <div className="flex justify-between py-2 border-b border-gray-100">
                   <span className="text-[hsl(155,10%,45%)]">Plan</span>
                   <span className="font-medium text-[hsl(155,35%,18%)]">
-                    {subscription.plan_type === "annual" ? "Annual" : subscription.plan_type === "monthly" ? "Monthly" : subscription.plan_type}
+                    {subscription.billingCycle === "annual" ? "Annual" : subscription.billingCycle === "monthly" ? "Monthly" : subscription.tier}
                   </span>
                 </div>
-                {subscription.current_period_end && (
+                {subscription.expiresAt && (
                   <div className="flex justify-between py-2 border-b border-gray-100">
                     <span className="text-[hsl(155,10%,45%)]">Renewal Date</span>
                     <span className="font-medium text-[hsl(155,35%,18%)]">
-                      {new Date(subscription.current_period_end).toLocaleDateString()}
+                      {new Date(subscription.expiresAt).toLocaleDateString()}
                     </span>
                   </div>
                 )}
+                <div className="flex gap-2 pt-2">
+                  {subscription.status === "canceled" ? (
+                    <Button
+                      variant="outline"
+                      className="flex-1 border-green-200 text-green-700 hover:bg-green-50"
+                      onClick={handleReactivateSubscription}
+                      disabled={manageSubscription.isPending}
+                    >
+                      {manageSubscription.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
+                      Reactivate Subscription
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      className="flex-1 border-red-200 text-red-600 hover:bg-red-50"
+                      onClick={handleCancelSubscription}
+                      disabled={manageSubscription.isPending}
+                    >
+                      {manageSubscription.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <XCircle className="w-4 h-4 mr-2" />}
+                      Cancel Subscription
+                    </Button>
+                  )}
+                </div>
               </>
             ) : (
               <p className="text-sm text-[hsl(155,10%,45%)] py-2">You don't have an active subscription yet.</p>
@@ -303,6 +454,39 @@ export default function Subscription() {
           </CardContent>
         </Card>
       </Reveal>
+
+      {/* Subscription History */}
+      {subHistory && (
+        <Reveal delay={0.25}>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Subscription History</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex justify-between py-2 border-b border-gray-100">
+                <span className="text-[hsl(155,10%,45%)]">Current Plan</span>
+                <span className="font-medium text-[hsl(155,35%,18%)]">{subHistory.tier || "Free"}</span>
+              </div>
+              {subHistory.billingCycle && (
+                <div className="flex justify-between py-2 border-b border-gray-100">
+                  <span className="text-[hsl(155,10%,45%)]">Billing Cycle</span>
+                  <span className="font-medium text-[hsl(155,35%,18%)]">{subHistory.billingCycle}</span>
+                </div>
+              )}
+              {subHistory.expiresAt && (
+                <div className="flex justify-between py-2 border-b border-gray-100">
+                  <span className="text-[hsl(155,10%,45%)]">Expires</span>
+                  <span className="font-medium text-[hsl(155,35%,18%)]">{new Date(subHistory.expiresAt).toLocaleDateString()}</span>
+                </div>
+              )}
+              <div className="flex justify-between py-2">
+                <span className="text-[hsl(155,10%,45%)]">Credits</span>
+                <span className="font-medium text-[hsl(155,35%,18%)]">{subHistory.credits ?? 0}</span>
+              </div>
+            </CardContent>
+          </Card>
+        </Reveal>
+      )}
     </div>
   );
 }

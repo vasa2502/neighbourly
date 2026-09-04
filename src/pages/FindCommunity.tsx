@@ -71,7 +71,7 @@ export default function FindCommunity() {
             <div className="w-16 h-16 rounded-2xl bg-[hsl(155,45%,92%)] flex items-center justify-center mx-auto mb-5">
               <Building2 className="w-8 h-8 text-[hsl(155,45%,32%)]" />
             </div>
-            <h1 className="text-3xl sm:text-4xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground tracking-[-0.02em] mb-3">
+            <h1 className="text-3xl sm:text-4xl font-[Bricolage_Grotesque] font-extrabold text-foreground tracking-[-0.02em] mb-3">
               Find Your Community
             </h1>
             <p className="text-muted-foreground max-w-lg mx-auto">
@@ -133,7 +133,7 @@ export default function FindCommunity() {
               const color = TYPE_COLORS[community.type] || TYPE_COLORS.apartment;
               return (
                 <motion.div
-                  key={community.id}
+                  key={community._id}
                   layout
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -147,7 +147,7 @@ export default function FindCommunity() {
                       </div>
                       <div className="p-5">
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-[Plus_Jakarta_Sans] font-bold text-foreground">
+                          <h3 className="font-[Bricolage_Grotesque] font-bold text-foreground">
                             {community.name}
                           </h3>
                           {community.verified && <span className="text-[10px] font-bold bg-[hsl(155,45%,92%)] text-[hsl(155,45%,32%)] px-1.5 py-0.5 rounded-full">✓ Verified</span>}
@@ -242,7 +242,7 @@ export default function FindCommunity() {
               <Card className="mt-8 border-border/60 shadow-sm rounded-2xl">
                 <CardContent className="p-8">
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className="font-[Plus_Jakarta_Sans] font-bold text-xl text-foreground">
+                    <h2 className="font-[Bricolage_Grotesque] font-bold text-xl text-foreground">
                       Bring Your Community to JOINN
                     </h2>
                     <button

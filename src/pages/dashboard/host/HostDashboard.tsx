@@ -25,7 +25,7 @@ export default function HostDashboard() {
       <Reveal>
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground">Host Dashboard</h1>
+            <h1 className="text-2xl sm:text-3xl font-[Bricolage_Grotesque] font-extrabold text-foreground">Host Dashboard</h1>
             <p className="text-sm text-muted-foreground mt-1">Manage your activities and clubs</p>
           </div>
           <Button className="bg-[hsl(155,45%,32%)] text-white hover:bg-[hsl(155,45%,26%)] font-semibold rounded-full" asChild>
@@ -53,7 +53,7 @@ export default function HostDashboard() {
           <div className="space-y-3">
             {upcoming.length === 0 && <p className="text-muted-foreground text-sm">No upcoming activities. Create one to get started!</p>}
             {upcoming.map((a: any) => (
-              <Link key={a.id} to={`/dashboard/activities/${a.id}`}>
+              <Link key={a._id} to={`/dashboard/activities/${a._id}`}>
                 <Card className="border-border/40 shadow-sm rounded-xl hover:shadow-md transition-all cursor-pointer">
                   <CardContent className="p-4 flex items-center justify-between">
                     <div><p className="font-semibold text-sm text-foreground">{a.title}</p><p className="text-xs text-muted-foreground">{a.date ? new Date(a.date).toLocaleDateString() : ""}</p></div>

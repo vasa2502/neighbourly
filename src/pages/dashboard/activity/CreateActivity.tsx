@@ -45,7 +45,7 @@ export default function CreateActivity() {
     <div className="max-w-2xl mx-auto px-4 pb-24 lg:pb-8 pt-4 lg:pt-6">
       <Reveal>
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground">Create Activity</h1>
+          <h1 className="text-2xl font-[Bricolage_Grotesque] font-extrabold text-foreground">Create Activity</h1>
           <span className="text-xs text-muted-foreground">Step {step + 1} of 4</span>
         </div>
         {/* Progress bar */}

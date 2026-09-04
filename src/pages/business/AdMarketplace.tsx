@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Reveal } from "@/components/motion/Reveal";
 import { Megaphone, Users, Clock, Eye, Loader2, Gavel, TrendingUp, X, Plus } from "lucide-react";
-import { useAdSlots, usePlaceBid, useBidsForSlot } from "@/hooks/useActivityClubPostData";
+import { useAdSlots, usePlaceBid, useBidsForSlot, useCreateAdSlot } from "@/hooks/useActivityClubPostData";
+import { useCommunity } from "@/contexts/CommunityContext";
 import { toast } from "sonner";
 
 const slotTypes = [
@@ -16,12 +17,6 @@ const slotTypes = [
   { name: "Calendar Banner", description: "Banner on community calendar", audience: "Active residents", placement: "Calendar" },
 ];
 
-const demoSlots = [
-  { id: "demo-1", name: "Community Banner", community_name: "Green Valley", resident_count: 847, current_bid: 120, reserve_price: 80, bids_count: 5, closes_in: "3 days", type: "banner" },
-  { id: "demo-2", name: "Newsletter Feature", community_name: "Sunrise Heights", resident_count: 520, current_bid: 85, reserve_price: 60, bids_count: 3, closes_in: "5 days", type: "newsletter" },
-  { id: "demo-3", name: "Activity Sponsor", community_name: "Oak Park", resident_count: 1200, current_bid: 200, reserve_price: 150, bids_count: 8, closes_in: "1 day", type: "sponsor" },
-  { id: "demo-4", name: "Welcome Screen", community_name: "Green Valley", resident_count: 847, current_bid: 150, reserve_price: 100, bids_count: 4, closes_in: "7 days", type: "welcome" },
-];
 
 export default function AdMarketplace() {
   const { data: realSlots = [], isLoading } = useAdSlots();
@@ -30,8 +25,14 @@ export default function AdMarketplace() {
   const [bidAmount, setBidAmount] = useState("");
   const [bidMessage, setBidMessage] = useState("");
   const [showCreateSlot, setShowCreateSlot] = useState(false);
+  const createAdSlot = useCreateAdSlot();
+  const { communityId } = useCommunity();
+  const [newSlotName, setNewSlotName] = useState("");
+  const [newSlotDesc, setNewSlotDesc] = useState("");
+  const [newSlotSize, setNewSlotSize] = useState("banner");
+  const [newSlotPrice, setNewSlotPrice] = useState("");
 
-  const displaySlots = realSlots.length > 0 ? realSlots : demoSlots;
+  const displaySlots = realSlots;
 
   const handlePlaceBid = () => {
     if (!selectedSlot || !bidAmount) return;
@@ -45,7 +46,7 @@ export default function AdMarketplace() {
       return;
     }
     placeBidMutation.mutate(
-      { slotId: selectedSlot.id, amount, message: bidMessage.trim() || undefined },
+      { slotId: selectedSlot._id, amount, message: bidMessage.trim() || undefined },
       {
         onSuccess: () => {
           toast.success(`Bid of $${amount}/mo placed successfully!`);
@@ -63,16 +64,35 @@ export default function AdMarketplace() {
     );
   };
 
+  const handleCreateSlot = async () => {
+    if (!newSlotName.trim() || !newSlotPrice) { toast.error("Name and price are required"); return; }
+    try {
+      await createAdSlot.mutateAsync({
+        communityId: communityId || "",
+        name: newSlotName,
+        description: newSlotDesc || undefined,
+        size: newSlotSize,
+        basePrice: parseFloat(newSlotPrice),
+        sellerId: "admin",
+      });
+      toast.success("Ad slot created!");
+      setNewSlotName(""); setNewSlotDesc(""); setNewSlotPrice(""); setShowCreateSlot(false);
+    } catch { toast.error("Failed to create slot"); }
+  };
+
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-24 lg:pb-8 pt-4 lg:pt-6">
       <Reveal>
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground flex items-center gap-3">
+          <h1 className="text-2xl font-[Bricolage_Grotesque] font-extrabold text-foreground flex items-center gap-3">
             <Megaphone className="w-6 h-6 text-[hsl(38,65%,42%)]" /> Ad Marketplace
           </h1>
           <div className="flex gap-2">
+            <Button size="sm" className="bg-[hsl(38,65%,42%)] text-white rounded-full" onClick={() => setShowCreateSlot(!showCreateSlot)}>
+              <Plus className="w-4 h-4 mr-1" /> Create Slot
+            </Button>
             <Button variant="outline" size="sm" className="rounded-full" asChild>
-              <a href="/dashboard/marketplace"><TrendingUp className="w-4 h-4 mr-1" /> My Campaigns</a>
+              <a href="/dashboard/campaigns"><TrendingUp className="w-4 h-4 mr-1" /> My Campaigns</a>
             </Button>
           </div>
         </div>
@@ -108,6 +128,39 @@ export default function AdMarketplace() {
         </div>
       </Reveal>
 
+      {/* Create Slot Form */}
+      {showCreateSlot && (
+        <Reveal delay={0.12}>
+          <Card className="mb-6 border-[hsl(38,65%,42%)]/30">
+            <CardContent className="p-5 space-y-3">
+              <h3 className="font-semibold text-foreground text-sm mb-2">Create New Ad Slot</h3>
+              <Input placeholder="Slot name" value={newSlotName} onChange={(e) => setNewSlotName(e.target.value)} className="rounded-xl" />
+              <Input placeholder="Description (optional)" value={newSlotDesc} onChange={(e) => setNewSlotDesc(e.target.value)} className="rounded-xl" />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs text-muted-foreground mb-1 block">Size</label>
+                  <div className="flex gap-1">
+                    {["banner", "sidebar", "inline"].map((s) => (
+                      <Button key={s} size="sm" variant={newSlotSize === s ? "default" : "outline"} onClick={() => setNewSlotSize(s)} className={newSlotSize === s ? "bg-[hsl(38,65%,42%)] text-white" : ""}>{s}</Button>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="text-xs text-muted-foreground mb-1 block">Base Price ($/mo)</label>
+                  <Input type="number" min="1" value={newSlotPrice} onChange={(e) => setNewSlotPrice(e.target.value)} placeholder="50" className="rounded-xl" />
+                </div>
+              </div>
+              <div className="flex gap-2 justify-end">
+                <Button variant="outline" size="sm" onClick={() => setShowCreateSlot(false)}>Cancel</Button>
+                <Button size="sm" className="bg-[hsl(38,65%,42%)] text-white" onClick={handleCreateSlot} disabled={createAdSlot.isPending}>
+                  {createAdSlot.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : null} Create
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </Reveal>
+      )}
+
       {/* Available Slots */}
       <Reveal delay={0.15}>
         <h2 className="font-semibold text-foreground mb-3 text-sm">Open for Bidding</h2>
@@ -127,13 +180,13 @@ export default function AdMarketplace() {
             const closesIn = slot.closes_in || slot.closing || "Open";
 
             return (
-              <Reveal key={slot.id || i} delay={0.15 + i * 0.04}>
+              <Reveal key={slot._id || i} delay={0.15 + i * 0.04}>
                 <Card className="border-border/40 shadow-sm rounded-2xl hover:shadow-md transition-all overflow-hidden">
                   <div className="bg-gradient-to-br from-[hsl(38,50%,92%)] to-[hsl(38,60%,88%)] h-20 flex items-center justify-center">
                     <Eye className="w-8 h-8 text-[hsl(38,65%,42%)]/40" />
                   </div>
                   <CardContent className="p-5">
-                    <h3 className="font-[Plus_Jakarta_Sans] font-bold text-foreground text-sm mb-1">{name}</h3>
+                    <h3 className="font-[Bricolage_Grotesque] font-bold text-foreground text-sm mb-1">{name}</h3>
                     <p className="text-xs text-muted-foreground mb-3">{community} · <Users className="w-3 h-3 inline" /> {audience.toLocaleString()} residents</p>
                     <div className="grid grid-cols-3 gap-2 mb-3">
                       <div className="bg-muted/30 rounded-lg p-2"><p className="text-[10px] text-muted-foreground">Current Bid</p><p className="text-sm font-bold text-foreground">${currentBid}/mo</p></div>
@@ -159,7 +212,7 @@ export default function AdMarketplace() {
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4" onClick={() => setSelectedSlot(null)}>
           <div className="bg-background rounded-2xl shadow-xl max-w-md w-full p-6" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-[Plus_Jakarta_Sans] font-bold text-foreground">Place a Bid</h3>
+              <h3 className="font-[Bricolage_Grotesque] font-bold text-foreground">Place a Bid</h3>
               <button onClick={() => setSelectedSlot(null)}><X className="w-5 h-5 text-muted-foreground" /></button>
             </div>
             <p className="text-sm text-muted-foreground mb-4">

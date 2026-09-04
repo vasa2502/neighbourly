@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
@@ -16,6 +16,8 @@ import {
   FileCheck,
   ArrowRight,
   CheckCircle2,
+  Upload,
+  X,
 } from "lucide-react";
 
 const steps = ["Account", "Verification", "Profile", "Interests", "Community"];
@@ -31,20 +33,68 @@ const methods = [
 export default function OnboardingVerification() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [code, setCode] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [proofFile, setProofFile] = useState<File | null>(null);
+  const [proofPreview, setProofPreview] = useState<string | null>(null);
+  const [uploadingProof, setUploadingProof] = useState(false);
+
+  const handleProofSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 10 * 1024 * 1024) { toast.error("File must be under 10MB"); return; }
+    setProofFile(file);
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = () => setProofPreview(reader.result as string);
+      reader.readAsDataURL(file);
+    } else {
+      setProofPreview(null);
+    }
+  };
+
+  const uploadProofDocument = async (): Promise<string | null> => {
+    if (!proofFile || !user) return null;
+    setUploadingProof(true);
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const ext = proofFile.name.split('.').pop() || 'pdf';
+      const path = `verification/${user.id}/${Date.now()}.${ext}`;
+      const { error } = await supabase.storage
+        .from('verification-documents')
+        .upload(path, proofFile, { contentType: proofFile.type });
+      if (error) throw error;
+      const { data } = supabase.storage.from('verification-documents').getPublicUrl(path);
+      return data?.publicUrl || null;
+    } catch {
+      return null;
+    } finally {
+      setUploadingProof(false);
+    }
+  };
 
   const handleSubmit = async () => {
     if (!selected) return;
     setSubmitting(true);
     try {
-      const { submitVerification } = await import("@/lib/api");
-      // For now, submit without communityId — user selects community later
-      toast.success("Verification method submitted. Continue to set up your profile.");
+      // Upload proof document if applicable
+      let proofUrl: string | null = null;
+      if (selected === 'proof' && proofFile) {
+        proofUrl = await uploadProofDocument();
+      }
+      // Store verification choice locally for later when user joins a community
+      const verificationData: Record<string, string> = {
+        method: selected,
+        ...(code && { invite_code: code }),
+        ...(proofUrl && { proof_url: proofUrl }),
+      };
+      localStorage.setItem('pending_verification', JSON.stringify(verificationData));
+      toast.success("Verification method saved. Continue to set up your profile.");
       navigate("/onboarding/profile");
     } catch (err: any) {
-      toast.error(err?.message || "Failed to submit verification");
+      toast.error(err?.message || "Failed to save verification method");
     } finally {
       setSubmitting(false);
     }
@@ -71,7 +121,7 @@ export default function OnboardingVerification() {
             <div className="w-14 h-14 rounded-2xl bg-[hsl(155,45%,92%)] flex items-center justify-center mx-auto mb-4">
               <Shield className="w-7 h-7 text-[hsl(155,45%,32%)]" />
             </div>
-            <h1 className="text-2xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-2">Verify that you live here</h1>
+            <h1 className="text-2xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-2">Verify that you live here</h1>
             <p className="text-sm text-muted-foreground max-w-md mx-auto">
               Verification keeps our community safe and ensures only real residents participate. Choose a verification method below.
             </p>
@@ -124,11 +174,37 @@ export default function OnboardingVerification() {
             <Card className="border-border/40 shadow-sm rounded-2xl mb-6">
               <CardContent className="p-5">
                 <label className="text-sm font-medium text-foreground mb-2 block">Upload residency proof</label>
-                <div className="border-2 border-dashed border-border rounded-xl p-8 text-center">
-                  <FileCheck className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-sm text-muted-foreground">Drag and drop or click to upload</p>
-                  <p className="text-[10px] text-muted-foreground mt-1">Utility bill, lease agreement, or government ID</p>
-                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*,.pdf"
+                  className="hidden"
+                  onChange={handleProofSelect}
+                />
+                {proofFile ? (
+                  <div className="border border-border rounded-xl p-4 flex items-center gap-3">
+                    <div className="w-12 h-12 rounded-lg bg-[hsl(155,45%,92%)] flex items-center justify-center shrink-0">
+                      <FileCheck className="w-6 h-6 text-[hsl(155,45%,32%)]" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-foreground truncate">{proofFile.name}</p>
+                      <p className="text-xs text-muted-foreground">{(proofFile.size / 1024).toFixed(1)} KB</p>
+                    </div>
+                    <button type="button" onClick={() => { setProofFile(null); setProofPreview(null); }} className="text-muted-foreground hover:text-destructive">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-[hsl(155,45%,32%)] hover:bg-[hsl(155,45%,98%)] transition-colors"
+                  >
+                    <Upload className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
+                    <p className="text-sm text-muted-foreground">Click to upload a file</p>
+                    <p className="text-[10px] text-muted-foreground mt-1">Utility bill, lease agreement, or government ID (max 10MB)</p>
+                  </button>
+                )}
               </CardContent>
             </Card>
           </Reveal>

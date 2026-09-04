@@ -10,7 +10,7 @@ export default function SuspendedAccount() {
         <Reveal>
           <Logo size="lg" className="justify-center mb-8" />
           <div className="w-16 h-16 rounded-2xl bg-destructive/10 flex items-center justify-center mx-auto mb-6"><Ban className="w-8 h-8 text-destructive" /></div>
-          <h1 className="text-2xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-2">Account suspended</h1>
+          <h1 className="text-2xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-2">Account suspended</h1>
           <p className="text-muted-foreground text-sm mb-6">Your account has been suspended. Please contact support for more information.</p>
           <Card className="border-border/40 shadow-sm rounded-2xl">
             <CardContent className="p-5">

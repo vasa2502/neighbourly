@@ -38,7 +38,7 @@ export default function CreatePost() {
         <Link to="/dashboard/posts" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6">
           <ArrowLeft className="w-4 h-4" /> Back to Posts
         </Link>
-        <h1 className="text-2xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-6">Create Post</h1>
+        <h1 className="text-2xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-6">Create Post</h1>
       </Reveal>
 
       <Reveal delay={0.05}>

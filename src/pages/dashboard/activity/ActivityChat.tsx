@@ -25,7 +25,7 @@ export default function ActivityChat() {
     const text = message;
     setMessage("");
     try {
-      await sendMessage.mutateAsync({ activityId: id, content: text });
+      await sendMessage.mutateAsync({ activityId: id, content: text, senderId: user?.id || "" });
     } catch {
       setMessage(text);
     }
@@ -58,7 +58,7 @@ export default function ActivityChat() {
           const authorName = msg.user_profiles?.name || "Anonymous";
           const time = new Date(msg.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
           return (
-            <div key={msg.id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
+            <div key={msg._id} className={`flex ${isMe ? "justify-end" : "justify-start"}`}>
               <div className={`max-w-[80%] ${!isMe ? "text-left" : ""}`}>
                 {!isMe && (
                   <div className="flex items-center gap-1.5 mb-1">

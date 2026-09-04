@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Reveal } from "@/components/motion/Reveal";
 import { BarChart3, CheckCircle2 } from "lucide-react";
-import { usePollResults, useVotePoll } from "@/hooks/useActivityClubPostData";
+import { usePollResults, useVotePoll } from "@/hooks/useMessagingData";
 import { usePolls } from "@/hooks/useMessagingData";
 import { useCommunity } from "@/contexts/CommunityContext";
 import { useAuth } from "@/contexts/AuthContext";
@@ -10,8 +10,8 @@ import { useAuth } from "@/contexts/AuthContext";
 function PollBar({ question, options, pollId }: { question: string; options: string[]; pollId: string }) {
   const { data: results } = usePollResults(pollId);
   const votePoll = useVotePoll();
-  const total = results?.total || 0;
-  const counts = results?.counts || {};
+  const total = (results as any)?.totalVotes || 0;
+  const voteCounts = (results as any)?.voteCounts || [];
 
   const handleVote = async (optionIndex: number) => {
     try {
@@ -23,8 +23,8 @@ function PollBar({ question, options, pollId }: { question: string; options: str
 
   const sortedOptions = options.map((opt, idx) => ({
     label: opt,
-    votes: counts[idx] || 0,
-    pct: total > 0 ? Math.round(((counts[idx] || 0) / total) * 100) : 0,
+    votes: voteCounts[idx] || 0,
+    pct: total > 0 ? Math.round(((voteCounts[idx] || 0) / total) * 100) : 0,
   })).sort((a, b) => b.votes - a.votes);
 
   return (
@@ -63,14 +63,14 @@ export default function PollResults() {
   return (
     <div className="max-w-2xl mx-auto px-4 pb-24 lg:pb-8 pt-4 lg:pt-6">
       <Reveal>
-        <h1 className="text-2xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-6 flex items-center gap-3"><BarChart3 className="w-6 h-6 text-[hsl(155,45%,32%)]" /> Poll Results</h1>
+        <h1 className="text-2xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-6 flex items-center gap-3"><BarChart3 className="w-6 h-6 text-[hsl(155,45%,32%)]" /> Poll Results</h1>
       </Reveal>
 
       {polls.length === 0 && <p className="text-muted-foreground text-sm text-center py-8">No polls yet.</p>}
 
       {polls.map((poll: any) => (
-        <Reveal key={poll.id} delay={0.05}>
-          <PollBar question={poll.question} options={poll.options || []} pollId={poll.id} />
+        <Reveal key={poll._id} delay={0.05}>
+          <PollBar question={poll.question} options={poll.options || []} pollId={poll._id} />
         </Reveal>
       ))}
     </div>

@@ -4,6 +4,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Reveal } from "@/components/motion/Reveal";
 import { useCommunity } from "@/contexts/CommunityContext";
 import { useActivities, useClubs, usePosts } from "@/hooks/useActivityClubPostData";
+import { InlineSponsors } from "@/components/sponsor/InlineSponsors";
+import { AdSlot } from "@/components/sponsor/AdSlot";
 import { useProfile } from "@/hooks/useCommunityData";
 import { useNotifications, useAnnouncements } from "@/hooks/useMessagingData";
 import {
@@ -50,7 +52,7 @@ export default function ResidentHome() {
   const hasData = activities.length > 0 || clubs.length > 0;
   const displayActivities = hasData
     ? activities.slice(0, 3).map((a: any) => ({
-        id: a.id,
+        id: a._id,
         title: a.title,
         time: a.date ? new Date(a.date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "TBD",
         location: a.location || "TBD",
@@ -68,7 +70,7 @@ export default function ResidentHome() {
 
   const displayClubs = hasData
     ? clubs.slice(0, 3).map((c: any) => ({
-        id: c.id,
+        id: c._id,
         name: c.name,
         members: c.member_count || 0,
         category: c.category || "Club",
@@ -81,7 +83,7 @@ export default function ResidentHome() {
 
   const displayAnnouncements = announcements.length > 0
     ? announcements.slice(0, 3).map((a: any) => ({
-        id: a.id,
+        id: a._id,
         title: a.title || "Announcement",
         date: a.created_at ? new Date(a.created_at).toLocaleDateString() : "Today",
         pinned: a.pinned || false,
@@ -93,7 +95,7 @@ export default function ResidentHome() {
 
   const displayPosts = hasData
     ? posts.slice(0, 2).map((p: any) => ({
-        id: p.id,
+        id: p._id,
         title: p.title || "New Post",
         author: (p.user_profiles as any)?.name || "Resident",
         time: p.created_at ? new Date(p.created_at).toLocaleDateString() : "Today",
@@ -109,7 +111,7 @@ export default function ResidentHome() {
       <Reveal>
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground tracking-[-0.02em]">
+            <h1 className="text-2xl sm:text-3xl font-[Bricolage_Grotesque] font-extrabold text-foreground tracking-[-0.02em]">
               Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 17 ? "afternoon" : "evening"} 👋
             </h1>
             <p className="text-muted-foreground mt-1">What's happening in your community today</p>
@@ -154,7 +156,7 @@ export default function ResidentHome() {
       <Reveal delay={0.1}>
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-[Plus_Jakarta_Sans] font-bold text-foreground flex items-center gap-2">
+            <h2 className="font-[Bricolage_Grotesque] font-bold text-foreground flex items-center gap-2">
               <Zap className="w-5 h-5 text-[hsl(155,45%,32%)]" />
               Today's Activities
             </h2>
@@ -166,7 +168,7 @@ export default function ResidentHome() {
             {displayActivities.map((activity: any) => {
               const Icon = activity.icon;
               return (
-                <Link key={activity.id} to={`/dashboard/activities/${activity.id}`}>
+                <Link key={activity._id} to={`/dashboard/activities/${activity._id}`}>
                   <Card className="border-border/40 shadow-sm hover:shadow-md transition-all rounded-xl cursor-pointer">
                     <CardContent className="p-4 flex items-center gap-4">
                       <div className={`w-12 h-12 rounded-xl ${activity.color} flex items-center justify-center shrink-0`}>
@@ -195,7 +197,7 @@ export default function ResidentHome() {
       <Reveal delay={0.15}>
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-[Plus_Jakarta_Sans] font-bold text-foreground flex items-center gap-2">
+            <h2 className="font-[Bricolage_Grotesque] font-bold text-foreground flex items-center gap-2">
               <Trophy className="w-5 h-5 text-[hsl(210,55%,42%)]" />
               Your Clubs
             </h2>
@@ -205,7 +207,7 @@ export default function ResidentHome() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {displayClubs.map((club: any) => (
-              <Link key={club.id} to="/dashboard/clubs">
+              <Link key={club._id} to="/dashboard/clubs">
                 <Card className="border-border/40 shadow-sm hover:shadow-md transition-all rounded-xl cursor-pointer">
                   <CardContent className="p-4">
                     <p className="font-semibold text-foreground text-sm">{club.name}</p>
@@ -224,7 +226,7 @@ export default function ResidentHome() {
       <Reveal delay={0.2}>
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-[Plus_Jakarta_Sans] font-bold text-foreground flex items-center gap-2">
+            <h2 className="font-[Bricolage_Grotesque] font-bold text-foreground flex items-center gap-2">
               <Megaphone className="w-5 h-5 text-[hsl(38,65%,42%)]" />
               Community Posts
             </h2>
@@ -234,7 +236,7 @@ export default function ResidentHome() {
           </div>
           <div className="space-y-3">
             {displayPosts.map((post: any) => (
-              <Link key={post.id} to="/dashboard/posts">
+              <Link key={post._id} to="/dashboard/posts">
                 <Card className="border-border/40 shadow-sm hover:shadow-md transition-all rounded-xl cursor-pointer">
                   <CardContent className="p-4">
                     <p className="font-semibold text-foreground text-sm">{post.title}</p>
@@ -251,14 +253,14 @@ export default function ResidentHome() {
       <Reveal delay={0.25}>
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="font-[Plus_Jakarta_Sans] font-bold text-foreground flex items-center gap-2">
+            <h2 className="font-[Bricolage_Grotesque] font-bold text-foreground flex items-center gap-2">
               <Megaphone className="w-5 h-5 text-[hsl(155,45%,32%)]" />
               Announcements
             </h2>
           </div>
           <div className="space-y-2">
             {displayAnnouncements.map((ann: any) => (
-              <Card key={ann.id} className="border-border/40 shadow-sm rounded-xl">
+              <Card key={ann._id} className="border-border/40 shadow-sm rounded-xl">
                 <CardContent className="p-4 flex items-center gap-3">
                   {ann.pinned && <span className="text-[10px] font-bold text-[hsl(155,45%,32%)] bg-[hsl(155,45%,95%)] px-2 py-0.5 rounded-full">PINNED</span>}
                   <div>
@@ -271,6 +273,14 @@ export default function ResidentHome() {
           </div>
         </div>
       </Reveal>
+
+      {/* Mobile inline sponsors */}
+      <InlineSponsors max={2} page="home" showMarkers />
+
+      {/* Desktop ad slot between sections */}
+      <div className="hidden xl:block">
+        <AdSlot placement="home_content" variant="banner" label="Sponsored" />
+      </div>
 
       {/* Community Growth CTA */}
       <Reveal delay={0.3}>

@@ -22,7 +22,7 @@ export default function ActivityParticipants() {
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 pb-24 lg:pb-8 pt-4 lg:pt-6">
       <Reveal>
-        <h1 className="text-2xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-6 flex items-center gap-3">
+        <h1 className="text-2xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-6 flex items-center gap-3">
           <Users className="w-6 h-6 text-[hsl(155,45%,32%)]" /> Participants ({displayParticipants.length})
         </h1>
       </Reveal>

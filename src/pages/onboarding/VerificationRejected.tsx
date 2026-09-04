@@ -14,7 +14,7 @@ export default function VerificationRejected() {
           <div className="w-16 h-16 rounded-2xl bg-destructive/10 flex items-center justify-center mx-auto mb-6">
             <XCircle className="w-8 h-8 text-destructive" />
           </div>
-          <h1 className="text-2xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-2">Verification unsuccessful</h1>
+          <h1 className="text-2xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-2">Verification unsuccessful</h1>
           <p className="text-muted-foreground text-sm mb-8">Your verification request was not approved. You may need to provide additional information.</p>
         </Reveal>
 

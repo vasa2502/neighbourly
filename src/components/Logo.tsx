@@ -53,7 +53,7 @@ export function Logo({ size = "md", className = "" }: LogoProps) {
     <span className={`inline-flex items-center gap-1.5 ${className}`}>
       <CommunityIcon size={s.icon} />
       <span
-        className={`font-[Plus_Jakarta_Sans] font-bold tracking-tight ${s.text}`}
+        className={`font-[Bricolage_Grotesque] font-bold tracking-tight ${s.text}`}
         style={{ color: "hsl(155 45% 32%)" }}
       >
         JOINN

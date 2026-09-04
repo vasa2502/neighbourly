@@ -17,12 +17,12 @@ export default function ModerationQueue() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-24 lg:pb-8 pt-4 lg:pt-6">
       <Reveal>
-        <h1 className="text-2xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-6 flex items-center gap-3"><AlertTriangle className="w-6 h-6 text-destructive" /> Moderation Queue ({reports.length})</h1>
+        <h1 className="text-2xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-6 flex items-center gap-3"><AlertTriangle className="w-6 h-6 text-destructive" /> Moderation Queue ({reports.length})</h1>
       </Reveal>
       {reports.length === 0 && <p className="text-muted-foreground text-sm text-center py-8">No pending reports.</p>}
       <div className="space-y-3">
         {reports.map((r: any, i: number) => (
-          <Reveal key={r.id || i} delay={i * 0.05}>
+          <Reveal key={r._id || i} delay={i * 0.05}>
             <Card className="border-border/40 shadow-sm rounded-2xl">
               <CardContent className="p-5">
                 <div className="flex items-center justify-between mb-2">
@@ -33,8 +33,8 @@ export default function ModerationQueue() {
                 <p className="text-sm font-semibold text-foreground mb-1">{r.reason || "Reported content"}</p>
                 <p className="text-xs text-muted-foreground mb-3">Reported by: {r.user_profiles?.name || "User"}</p>
                 <div className="flex gap-2">
-                  <Button size="sm" className="h-7 text-xs font-semibold bg-[hsl(155,45%,32%)] text-white rounded-full" onClick={() => dismissReport.mutate(r.id)}>Dismiss</Button>
-                  <Button size="sm" variant="outline" className="h-7 text-xs rounded-full" onClick={() => removeContent.mutate(r.id)}>Remove</Button>
+                  <Button size="sm" className="h-7 text-xs font-semibold bg-[hsl(155,45%,32%)] text-white rounded-full" onClick={() => dismissReport.mutate(r._id)}>Dismiss</Button>
+                  <Button size="sm" variant="outline" className="h-7 text-xs rounded-full" onClick={() => removeContent.mutate(r._id)}>Remove</Button>
                   <Button size="sm" variant="outline" className="h-7 text-xs rounded-full text-destructive border-destructive/20" onClick={() => { if (r.reporter_id && communityId) suspendUser.mutate({ userId: r.reporter_id, communityId, reason: r.reason || "Suspended by moderator" }); }}>Suspend</Button>
                 </div>
               </CardContent>

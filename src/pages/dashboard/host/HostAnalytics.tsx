@@ -22,7 +22,7 @@ export default function HostAnalytics() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-24 lg:pb-8 pt-4 lg:pt-6">
       <Reveal>
-        <h1 className="text-2xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-6 flex items-center gap-3"><BarChart3 className="w-6 h-6 text-[hsl(155,45%,32%)]" /> Host Analytics</h1>
+        <h1 className="text-2xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-6 flex items-center gap-3"><BarChart3 className="w-6 h-6 text-[hsl(155,45%,32%)]" /> Host Analytics</h1>
       </Reveal>
 
       <Reveal delay={0.05}>
@@ -44,7 +44,7 @@ export default function HostAnalytics() {
         <div className="space-y-3">
           {activities.length === 0 && <p className="text-muted-foreground text-sm">No activities to show analytics for.</p>}
           {activities.map((a: any) => (
-            <Card key={a.id} className="border-border/40 shadow-sm rounded-xl">
+            <Card key={a._id} className="border-border/40 shadow-sm rounded-xl">
               <CardContent className="p-4 flex items-center gap-4">
                 <Calendar className="w-5 h-5 text-[hsl(155,45%,32%)] shrink-0" />
                 <div className="flex-1"><p className="text-sm font-semibold text-foreground">{a.title}</p><p className="text-xs text-muted-foreground">{a.current_participants || 0} participants · {a.date ? new Date(a.date).toLocaleDateString() : ""}</p></div>

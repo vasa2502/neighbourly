@@ -21,7 +21,7 @@ export default function MyProfile() {
     <div className="max-w-2xl mx-auto px-4 sm:px-6 pb-24 lg:pb-8 pt-4 lg:pt-6">
       <Reveal>
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl sm:text-3xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground">My Profile</h1>
+          <h1 className="text-2xl sm:text-3xl font-[Bricolage_Grotesque] font-extrabold text-foreground">My Profile</h1>
           <Button variant="outline" className="rounded-full text-sm" asChild><Link to="/dashboard/profile/edit"><Edit3 className="w-4 h-4 mr-1.5" /> Edit</Link></Button>
         </div>
       </Reveal>
@@ -37,7 +37,7 @@ export default function MyProfile() {
               )}
             </div>
             <div>
-              <h2 className="font-[Plus_Jakarta_Sans] font-bold text-xl text-foreground">{name}</h2>
+              <h2 className="font-[Bricolage_Grotesque] font-bold text-xl text-foreground">{name}</h2>
               <p className="text-sm text-muted-foreground">{profile?.building || "Community"} · {profile?.subscription?.tier === "resident_plus" ? "Resident+" : "Resident"}</p>
               <p className="text-xs text-muted-foreground mt-1">{bio}</p>
             </div>

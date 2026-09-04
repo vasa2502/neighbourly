@@ -37,7 +37,9 @@ export default function CreateCommunity() {
     if (!form.name) return null;
     setSearching(true);
     try {
-      const results = await import("@/lib/api").then(m => m.searchCommunities(form.name, { city: form.city }));
+      const { convex } = await import("@/lib/convex");
+      const { api } = await import("../../convex/_generated/api");
+      const results = await convex.query(api.communities.findDuplicates, { name: form.name, city: form.city, area: form.area || "" }).catch(() => []);
       const dup = results?.find((c: any) => c.name.toLowerCase() === form.name.toLowerCase() && c.city.toLowerCase() === form.city.toLowerCase());
       setDuplicate(dup || null);
       setSearching(false);
@@ -69,10 +71,11 @@ export default function CreateCommunity() {
         invitationCode: Math.random().toString(36).substring(2, 8).toUpperCase(),
       } as any);
       // Also create founder membership
-      const { joinCommunity } = await import("@/lib/api");
-      await joinCommunity(user.id, community.id, "founder");
+      const { convex } = await import("@/lib/convex");
+      const { api } = await import("../../convex/_generated/api");
+      await convex.mutation(api.memberships.join, { userId: user.id, communityId: community._id, role: "founder" });
       toast.success("Community created! You are the Community Founder.");
-      navigate(`/community/${community.id}`);
+      navigate(`/community/${community._id}`);
     } catch (err: any) {
       toast.error(err?.message || "Failed to create community");
     }
@@ -107,7 +110,7 @@ export default function CreateCommunity() {
           <Reveal delay={0.05}>
             <div className="text-center mb-8">
               <div className="w-16 h-16 rounded-2xl bg-[hsl(155,45%,92%)] flex items-center justify-center mx-auto mb-4"><Home className="w-8 h-8 text-[hsl(155,45%,32%)]" /></div>
-              <h1 className="text-2xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-2">Bring Your Community to JOINN</h1>
+              <h1 className="text-2xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-2">Bring Your Community to JOINN</h1>
               <p className="text-sm text-muted-foreground max-w-md mx-auto">Start your community and invite neighbours. No property manager approval needed.</p>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
@@ -128,7 +131,7 @@ export default function CreateCommunity() {
         {/* Step 1: Community Info */}
         {step === 1 && (
           <Reveal delay={0.05}>
-            <h2 className="text-xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-6">Tell us about your community</h2>
+            <h2 className="text-xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-6">Tell us about your community</h2>
             <Card className="border-border/40 shadow-sm rounded-2xl mb-6">
               <CardContent className="p-5 space-y-4">
                 <div className="space-y-1.5"><label className="text-sm font-medium text-foreground">Community name *</label><Input placeholder="e.g. Green Valley Residency" value={form.name} onChange={e => update("name", e.target.value)} className="rounded-xl h-11" /></div>
@@ -151,7 +154,7 @@ export default function CreateCommunity() {
         {/* Step 2: Review */}
         {step === 2 && (
           <Reveal delay={0.05}>
-            <h2 className="text-xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-6">Review & Create</h2>
+            <h2 className="text-xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-6">Review & Create</h2>
             {duplicate && (
               <Card className="border-[hsl(38,65%,42%)]/30 bg-[hsl(38,50%,92%)] shadow-sm rounded-2xl mb-6">
                 <CardContent className="p-5">

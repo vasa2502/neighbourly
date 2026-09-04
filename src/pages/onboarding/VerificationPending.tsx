@@ -14,7 +14,7 @@ export default function VerificationPending() {
           <div className="w-16 h-16 rounded-2xl bg-[hsl(38,50%,92%)] flex items-center justify-center mx-auto mb-6">
             <Clock className="w-8 h-8 text-[hsl(38,65%,42%)]" />
           </div>
-          <h1 className="text-2xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-2">Verification pending</h1>
+          <h1 className="text-2xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-2">Verification pending</h1>
           <p className="text-muted-foreground text-sm mb-8">Your request has been submitted. The community admin will review it shortly.</p>
         </Reveal>
 

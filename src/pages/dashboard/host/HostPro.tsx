@@ -21,7 +21,7 @@ const features = [
 export default function HostPro() {
   const navigate = useNavigate();
   const { data: subscription } = useSubscription();
-  const isActive = subscription?.status === "active" && subscription?.plan_type === "host_pro";
+  const isActive = subscription?.status === "active" && subscription?.tier === "host_pro";
 
   return (
     <div className="max-w-lg mx-auto px-4 pb-24 lg:pb-8 pt-4 lg:pt-6">
@@ -37,7 +37,7 @@ export default function HostPro() {
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[hsl(38,65%,42%)] to-[hsl(32,65%,38%)] flex items-center justify-center mx-auto mb-4 shadow-lg">
             <Zap className="w-8 h-8 text-white" />
           </div>
-          <h2 className="text-3xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-2">Host Pro</h2>
+          <h2 className="text-3xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-2">Host Pro</h2>
           <p className="text-muted-foreground">Advanced tools for activity hosts</p>
           {isActive && (
             <Badge className="mt-2 bg-[hsl(155,45%,92%)] text-[hsl(155,45%,32%)]">Active Subscription</Badge>
@@ -47,7 +47,7 @@ export default function HostPro() {
 
       <Reveal delay={0.1}>
         <div className="text-center mb-8">
-          <span className="text-5xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground">$9.99</span>
+          <span className="text-5xl font-[Bricolage_Grotesque] font-extrabold text-foreground">$9.99</span>
           <span className="text-muted-foreground text-lg">/month</span>
           <p className="text-xs text-muted-foreground mt-1">Billed monthly. Cancel anytime.</p>
         </div>

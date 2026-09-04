@@ -19,11 +19,12 @@ import {
   Clock,
   MapPin,
 } from "lucide-react";
-import { useActivities } from "@/hooks/useActivityClubPostData";
-import { useClubs } from "@/hooks/useActivityClubPostData";
-import { usePosts } from "@/hooks/useActivityClubPostData";
+import { useActivities, useClubs, usePosts } from "@/hooks/useActivityClubPostData";
+import { useCommunityMembers } from "@/hooks/useCommunityData";
 import { useCommunity } from "@/contexts/CommunityContext";
 import { useProfile } from "@/hooks/useCommunityData";
+import { AdSlot } from "@/components/sponsor/AdSlot";
+import { InlineSponsors } from "@/components/sponsor/InlineSponsors";
 
 type Tab = "activities" | "people" | "clubs" | "posts";
 
@@ -38,18 +39,7 @@ const categories = ["All", "Sports", "Fitness", "Social", "Family", "Kids", "Hob
 
 const activityIcons: Record<string, any> = { sports: Dumbbell, fitness: Heart, social: Users, family: Star, kids: Gamepad2, hobby: BookOpen, learning: BookOpen, outdoor: Trophy };
 
-const fallbackActivities = [
-  { id: "1", title: "Morning Badminton", category: "Sports", time: "Today · 7:00 AM", location: "Court A", spots: 3, host: "Rajesh K.", free: true },
-  { id: "2", title: "Weekend Yoga", category: "Fitness", time: "Sat · 8:00 AM", location: "Clubhouse", spots: 8, host: "Priya S.", free: true },
-  { id: "3", title: "Football Practice", category: "Sports", time: "Wed · 5:30 PM", location: "Main Ground", spots: 5, host: "Vikram S.", free: true },
-  { id: "4", title: "Book Club Meetup", category: "Social", time: "Fri · 6:30 PM", location: "Lounge", spots: 10, host: "Sarah L.", free: true },
-];
 
-const fallbackPeople = [
-  { id: "1", name: "Rajesh K.", building: "Tower A", interests: ["Badminton", "Cricket"], verified: true },
-  { id: "2", name: "Priya S.", building: "Tower B", interests: ["Yoga", "Photography"], verified: true },
-  { id: "3", name: "Vikram S.", building: "Tower C", interests: ["Football", "Tennis"], verified: true },
-];
 
 export default function Discover() {
   const [activeTab, setActiveTab] = useState<Tab>("activities");
@@ -57,14 +47,15 @@ export default function Discover() {
   const [activeCategory, setActiveCategory] = useState("All");
   const { communityId } = useCommunity();
 
-  const { data: rawActivities } = useActivities(communityId || "");
-  const { data: rawClubs } = useClubs(communityId || "");
-  const { data: rawPosts } = usePosts(communityId || "");
+  const { data: rawActivities = [] } = useActivities(communityId || "");
+  const { data: rawClubs = [] } = useClubs(communityId || "");
+  const { data: rawPosts = [] } = usePosts(communityId || "");
+  const { data: people = [], isLoading: peopleLoading } = useCommunityMembers(communityId || "");
   const { data: profile } = useProfile();
 
-  const activities = rawActivities?.length ? rawActivities : fallbackActivities;
-  const clubs = rawClubs?.length ? rawClubs : [];
-  const posts = rawPosts?.length ? rawPosts : [];
+  const activities = rawActivities;
+  const clubs = rawClubs;
+  const posts = rawPosts;
 
   const filteredActivities = (Array.isArray(activities) ? activities : []).filter((a: any) => {
     const matchesSearch = !searchQuery || a.title?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -79,7 +70,7 @@ export default function Discover() {
     <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-24 lg:pb-8 pt-4 lg:pt-6">
       <Reveal>
         <div className="mb-6">
-          <h1 className="text-2xl sm:text-3xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground tracking-[-0.02em] flex items-center gap-3">
+          <h1 className="text-2xl sm:text-3xl font-[Bricolage_Grotesque] font-extrabold text-foreground tracking-[-0.02em] flex items-center gap-3">
             <Compass className="w-7 h-7 text-[hsl(155,45%,32%)]" />
             Discover
           </h1>
@@ -126,8 +117,8 @@ export default function Discover() {
             const colorBg = ["sports", "fitness"].includes(catKey) ? "bg-[hsl(155,45%,92%)]" : ["social", "hobby"].includes(catKey) ? "bg-[hsl(38,50%,92%)]" : "bg-[hsl(210,40%,92%)]";
             const colorTxt = ["sports", "fitness"].includes(catKey) ? "text-[hsl(155,45%,32%)]" : ["social", "hobby"].includes(catKey) ? "text-[hsl(38,65%,42%)]" : "text-[hsl(210,55%,42%)]";
             return (
-              <Reveal key={activity.id || i} delay={i * 0.05}>
-                <Link to={`/dashboard/activities/${activity.id}`}>
+              <Reveal key={activity._id || i} delay={i * 0.05}>
+                <Link to={`/dashboard/activities/${activity._id}`}>
                   <Card className="border-border/40 shadow-sm hover:shadow-md transition-all rounded-2xl overflow-hidden cursor-pointer group h-full">
                     <CardContent className="p-0">
                       <div className={`${colorBg} h-24 flex items-center justify-center`}>
@@ -159,35 +150,68 @@ export default function Discover() {
 
       {activeTab === "people" && (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {fallbackPeople.map((person, i) => (
-            <Reveal key={person.id} delay={i * 0.05}>
-              <Card className="border-border/40 shadow-sm hover:shadow-md transition-all rounded-2xl cursor-pointer">
-                <CardContent className="p-5 flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-[hsl(155,45%,92%)] flex items-center justify-center shrink-0">
-                    <span className="text-sm font-bold text-[hsl(155,45%,32%)]">{person.name.split(" ").map(n => n[0]).join("")}</span>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-foreground text-sm">{person.name}</h3>
-                      {person.verified && <span className="w-4 h-4 rounded-full bg-[hsl(155,45%,32%)] flex items-center justify-center"><svg className="w-2.5 h-2.5 text-white" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></span>}
+          {peopleLoading ? (
+            <div className="col-span-full text-center py-12">
+              <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground">Loading residents...</p>
+            </div>
+          ) : people.length > 0 ? (
+            (people as any[]).filter((p: any) => {
+              if (!searchQuery) return true;
+              const q = searchQuery.toLowerCase();
+              return p.name?.toLowerCase().includes(q) ||
+                     p.building?.toLowerCase().includes(q) ||
+                     (p.interests || []).some((i: string) => i.toLowerCase().includes(q)) ||
+                     (p.sports || []).some((s: any) => (s.name || s).toLowerCase().includes(q));
+            }).map((person: any, i: number) => (
+              <Reveal key={person._id || i} delay={i * 0.05}>
+                <Card className="border-border/40 shadow-sm hover:shadow-md transition-all rounded-2xl cursor-pointer">
+                  <CardContent className="p-5 flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-full bg-[hsl(155,45%,92%)] flex items-center justify-center shrink-0">
+                      {person.avatar ? (
+                        <img src={person.avatar} alt={person.name} className="w-12 h-12 rounded-full object-cover" />
+                      ) : (
+                        <span className="text-sm font-bold text-[hsl(155,45%,32%)]">{(person.name || "?").split(" ").map((n: string) => n[0]).join("")}</span>
+                      )}
                     </div>
-                    <p className="text-xs text-muted-foreground">{person.building}</p>
-                    <div className="flex flex-wrap gap-1 mt-2">
-                      {person.interests.map((interest) => <span key={interest} className="text-[10px] font-medium bg-muted px-2 py-0.5 rounded-full text-muted-foreground">{interest}</span>)}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-semibold text-foreground text-sm">{person.name || "Resident"}</h3>
+                        {person.verified && <span className="w-4 h-4 rounded-full bg-[hsl(155,45%,32%)] flex items-center justify-center"><svg className="w-2.5 h-2.5 text-white" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg></span>}
+                      </div>
+                      {person.building && <p className="text-xs text-muted-foreground">{person.building}</p>}
+                      {(person.interests?.length > 0 || person.sports?.length > 0) && (
+                        <div className="flex flex-wrap gap-1 mt-2">
+                          {(person.interests || []).slice(0, 4).map((interest: string) => (
+                            <span key={interest} className="text-[10px] font-medium bg-muted px-2 py-0.5 rounded-full text-muted-foreground">{interest}</span>
+                          ))}
+                          {(person.sports || []).slice(0, 2).map((sport: any) => (
+                            <span key={typeof sport === 'string' ? sport : sport.name} className="text-[10px] font-medium bg-[hsl(155,45%,92%)] px-2 py-0.5 rounded-full text-[hsl(155,45%,32%)]">
+                              {typeof sport === 'string' ? sport : sport.name}
+                            </span>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </Reveal>
-          ))}
+                  </CardContent>
+                </Card>
+              </Reveal>
+            ))
+          ) : (
+            <div className="col-span-full text-center py-12">
+              <Users className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
+              <p className="text-sm text-muted-foreground">No residents found{searchQuery ? ` matching "${searchQuery}"` : "."}</p>
+              <p className="text-xs text-muted-foreground mt-1">Residents appear here once they join your community.</p>
+            </div>
+          )}
         </div>
       )}
 
       {activeTab === "clubs" && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {(filteredClubs as any[]).length > 0 ? (filteredClubs as any[]).map((club: any, i: number) => (
-            <Reveal key={club.id || i} delay={i * 0.05}>
-              <Link to={`/dashboard/clubs/${club.id}`}>
+            <Reveal key={club._id || i} delay={i * 0.05}>
+              <Link to={`/dashboard/clubs/${club._id}`}>
                 <Card className="border-border/40 shadow-sm hover:shadow-md transition-all rounded-2xl overflow-hidden cursor-pointer group">
                   <CardContent className="p-0">
                     <div className="bg-gradient-to-br from-[hsl(155,45%,32%)] to-[hsl(155,55%,22%)] h-28 flex items-center justify-center">
@@ -195,7 +219,7 @@ export default function Discover() {
                     </div>
                     <div className="p-5">
                       <span className="text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground">{club.category}</span>
-                      <h3 className="font-[Plus_Jakarta_Sans] font-bold text-foreground mt-0.5 mb-2">{club.name}</h3>
+                      <h3 className="font-[Bricolage_Grotesque] font-bold text-foreground mt-0.5 mb-2">{club.name}</h3>
                       <div className="flex items-center gap-4 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1"><Users className="w-3 h-3" />{club.member_count || 0} members</span>
                       </div>
@@ -212,6 +236,12 @@ export default function Discover() {
 
       {activeTab === "posts" && (
         <div className="space-y-3">
+          {/* Ad placement between posts */}
+          <AdSlot placement="discover_posts" variant="banner" label="Sponsored" />
+          {/* Ad placement between content */}
+          <AdSlot placement="discover_posts" variant="banner" label="Sponsored" />
+
+
           {(filteredPosts as any[]).length > 0 ? (filteredPosts as any[]).map((post: any, i: number) => {
             const typeColors: Record<string, { text: string; bg: string }> = {
               ask: { text: "text-[hsl(155,50%,38%)]", bg: "bg-[hsl(155,45%,92%)]" },
@@ -223,8 +253,8 @@ export default function Discover() {
             };
             const tc = typeColors[post.type] || typeColors.discussion;
             return (
-              <Reveal key={post.id || i} delay={i * 0.05}>
-                <Link to={`/dashboard/posts/${post.id}`}>
+              <Reveal key={post._id || i} delay={i * 0.05}>
+                <Link to={`/dashboard/posts/${post._id}`}>
                   <Card className="border-border/40 shadow-sm hover:shadow-md transition-all rounded-2xl cursor-pointer">
                     <CardContent className="p-5">
                       <div className="flex items-center justify-between mb-2">

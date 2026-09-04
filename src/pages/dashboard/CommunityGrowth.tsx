@@ -7,6 +7,7 @@ import { ArrowLeft, Users, UserPlus, Share2, QrCode, Mail, Copy, CheckCircle, Tr
 import { useNavigate } from "react-router-dom";
 import { useProfile } from "@/hooks/useCommunityData";
 import { useReferrals, useCreateReferral } from "@/hooks/useMessagingData";
+import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { QRCode } from "@/components/QRCode";
 
@@ -15,6 +16,7 @@ export default function CommunityGrowth() {
   const [copied, setCopied] = useState(false);
   const [inviteEmail, setInviteEmail] = useState("");
   const { data: profile } = useProfile();
+  const { user } = useAuth();
   const { data: referrals = [] } = useReferrals();
   const createReferral = useCreateReferral();
 
@@ -28,10 +30,28 @@ export default function CommunityGrowth() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleShareEmail = () => {
+    const subject = encodeURIComponent("Join my community on JOINN!");
+    const body = encodeURIComponent(`Hey! I'd like to invite you to join my residential community on JOINN.\n\nUse this link to join: ${inviteLink}`);
+    window.open(`mailto:?subject=${subject}&body=${body}`, "_blank");
+  };
+
+  const handleNativeShare = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: "Join my community on JOINN",
+        text: "Join our residential community on JOINN!",
+        url: inviteLink,
+      }).catch(() => {});
+    } else {
+      handleCopy(inviteLink);
+    }
+  };
+
   const handleInvite = async () => {
     if (!inviteEmail.trim()) { toast.error("Enter an email"); return; }
     try {
-      await createReferral.mutateAsync({ referredEmail: inviteEmail, communityId: (profile as any)?.community_id });
+      await createReferral.mutateAsync({ referrerId: user?.id || "", referredEmail: inviteEmail, communityId: (profile as any)?.community_id });
       toast.success("Invitation sent!");
       setInviteEmail("");
     } catch (err: any) {
@@ -150,13 +170,13 @@ export default function CommunityGrowth() {
               </div>
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" className="flex-1 border-[hsl(155,35%,85%)] text-[hsl(155,35%,18%)]">
+              <Button variant="outline" className="flex-1 border-[hsl(155,35%,85%)] text-[hsl(155,35%,18%)]" onClick={handleShareEmail}>
                 <Mail className="w-4 h-4 mr-2" /> Email
               </Button>
               <Button variant="outline" className="flex-1 border-[hsl(155,35%,85%)] text-[hsl(155,35%,18%)]" onClick={() => setShowQR(!showQR)}>
                 <QrCode className="w-4 h-4 mr-2" /> {showQR ? "Hide QR" : "QR Code"}
               </Button>
-              <Button variant="outline" className="flex-1 border-[hsl(155,35%,85%)] text-[hsl(155,35%,18%)]">
+              <Button variant="outline" className="flex-1 border-[hsl(155,35%,85%)] text-[hsl(155,35%,18%)]" onClick={handleNativeShare}>
                 <ExternalLink className="w-4 h-4 mr-2" /> Share Link
               </Button>
             </div>
@@ -191,7 +211,7 @@ export default function CommunityGrowth() {
               </div>
             ) : (
               referrals.slice(0, 10).map((ref: any, i: number) => (
-                <div key={ref.id || i} className="flex items-center justify-between p-3 rounded-xl bg-gray-50">
+                <div key={ref._id || i} className="flex items-center justify-between p-3 rounded-xl bg-gray-50">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-[hsl(155,45%,90%)] flex items-center justify-center text-[hsl(155,45%,32%)] font-semibold text-sm">
                       {(ref.referred_email || "?").charAt(0).toUpperCase()}

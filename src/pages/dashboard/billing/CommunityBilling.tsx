@@ -11,8 +11,8 @@ export default function CommunityBilling() {
 
   const credits = (profile as any)?.referral_credits || profile?.referralCredits || 0;
   const tier = subscription?.tier || "free";
-  const billingCycle = subscription?.billing_cycle || null;
-  const expiresAt = subscription?.expires_at || null;
+  const billingCycle = subscription?.billingCycle || null;
+  const expiresAt = subscription?.expiresAt || null;
 
   // All prices displayed in USD
   const p = { monthly: 6.99, annual: 69.9, currency: "USD", symbol: "$" };
@@ -28,7 +28,7 @@ export default function CommunityBilling() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-24 lg:pb-8 pt-4 lg:pt-6">
       <Reveal>
-        <h1 className="text-2xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-6">Community Billing</h1>
+        <h1 className="text-2xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-6">Community Billing</h1>
       </Reveal>
 
       <Reveal delay={0.05}>
@@ -36,7 +36,7 @@ export default function CommunityBilling() {
           <CardContent className="p-6">
             <div className="flex items-center gap-3 mb-4">
               <CreditCard className="w-6 h-6 text-[hsl(155,45%,32%)]" />
-              <h2 className="font-[Plus_Jakarta_Sans] font-bold text-foreground">
+              <h2 className="font-[Bricolage_Grotesque] font-bold text-foreground">
                 {tier === "free" ? "Free Plan" : tier === "resident_plus" ? "Resident Plus" : tier === "host_pro" ? "Host Pro" : tier === "community_partner" ? "Community Partner" : tier}
               </h2>
               <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${

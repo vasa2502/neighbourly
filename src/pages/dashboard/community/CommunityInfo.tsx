@@ -18,7 +18,7 @@ export default function CommunityInfo() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-24 lg:pb-8 pt-4 lg:pt-6">
       <Reveal>
-        <h1 className="text-2xl sm:text-3xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-6">Community Information</h1>
+        <h1 className="text-2xl sm:text-3xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-6">Community Information</h1>
       </Reveal>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

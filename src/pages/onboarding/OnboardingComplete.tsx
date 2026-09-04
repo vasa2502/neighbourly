@@ -27,7 +27,7 @@ export default function OnboardingComplete() {
         </Reveal>
 
         <Reveal delay={0.15}>
-          <h1 className="text-3xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-3">
+          <h1 className="text-3xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-3">
             You're ready to explore.
           </h1>
           <p className="text-muted-foreground text-lg mb-10 max-w-sm mx-auto">

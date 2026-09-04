@@ -5,6 +5,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { User, Shield, Bell, Lock, LogOut, ChevronRight, Home, Eye, Dumbbell } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { DarkModeToggle } from "@/components/DarkModeToggle";
 
 const settingSections = [
   {
@@ -19,7 +20,7 @@ const settingSections = [
     title: "Account",
     items: [
       { icon: Shield, label: "Verification Status", description: "Manage your residency verification", to: "/dashboard/profile/participation" },
-      { icon: Bell, label: "Notification Preferences", description: "Configure what notifications you receive", to: "/dashboard/notifications" },
+      { icon: Bell, label: "Notification Preferences", description: "Configure what notifications you receive", to: "/dashboard/settings/notifications" },
       { icon: Lock, label: "Security", description: "Password, login methods", to: "/dashboard/profile/account" },
       { icon: Home, label: "Community Membership", description: "Manage your community connections", to: "/dashboard/profile/account" },
     ],
@@ -33,7 +34,7 @@ export default function SettingsPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 pb-24 lg:pb-8 pt-4 lg:pt-6">
       <Reveal>
-        <h1 className="text-2xl sm:text-3xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground tracking-[-0.02em] mb-6">
+        <h1 className="text-2xl sm:text-3xl font-[Bricolage_Grotesque] font-extrabold text-foreground tracking-[-0.02em] mb-6">
           Settings
         </h1>
       </Reveal>
@@ -41,7 +42,7 @@ export default function SettingsPage() {
       {settingSections.map((section, si) => (
         <Reveal key={section.title} delay={si * 0.1}>
           <section className="mb-8">
-            <h2 className="font-[Plus_Jakarta_Sans] font-bold text-foreground mb-3 text-sm uppercase tracking-wider text-muted-foreground">
+            <h2 className="font-[Bricolage_Grotesque] font-bold text-foreground mb-3 text-sm uppercase tracking-wider text-muted-foreground">
               {section.title}
             </h2>
             <Card className="border-border/40 shadow-sm rounded-2xl overflow-hidden">
@@ -70,6 +71,21 @@ export default function SettingsPage() {
           </section>
         </Reveal>
       ))}
+
+      <Reveal delay={0.15}>
+        <section className="mb-8">
+          <h2 className="font-[Bricolage_Grotesque] font-bold text-foreground mb-3 text-sm uppercase tracking-wider text-muted-foreground">
+            Appearance
+          </h2>
+          <Card className="border-border/40 shadow-sm rounded-2xl p-4 flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold text-foreground">Theme</p>
+              <p className="text-xs text-muted-foreground">Switch between light, dark, and system theme</p>
+            </div>
+            <DarkModeToggle />
+          </Card>
+        </section>
+      </Reveal>
 
       <Reveal delay={0.2}>
         <Button

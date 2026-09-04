@@ -37,7 +37,7 @@ export default function ActivityFeedback() {
         <Reveal>
           <div className="text-center mb-8">
             <div className="w-16 h-16 rounded-full bg-[hsl(155,45%,32%)] flex items-center justify-center mx-auto mb-4"><CheckCircle2 className="w-8 h-8 text-white" /></div>
-            <h1 className="text-2xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-2">Thank you!</h1>
+            <h1 className="text-2xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-2">Thank you!</h1>
             <p className="text-muted-foreground text-sm mb-6">Your feedback has been submitted.</p>
             <Button className="bg-[hsl(155,45%,32%)] text-white hover:bg-[hsl(155,45%,26%)] font-semibold rounded-full" asChild><Link to="/dashboard/home">Return Home</Link></Button>
           </div>
@@ -50,7 +50,7 @@ export default function ActivityFeedback() {
     <div className="max-w-lg mx-auto px-4 pb-24 lg:pb-8 pt-12">
       <Reveal>
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-2">How was {activityTitle}?</h1>
+          <h1 className="text-2xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-2">How was {activityTitle}?</h1>
           <p className="text-muted-foreground text-sm">Your feedback helps improve community activities.</p>
         </div>
       </Reveal>

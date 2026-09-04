@@ -3,8 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Reveal } from "@/components/motion/Reveal";
 import { useCommunity } from "@/contexts/CommunityContext";
+import { AdSlot } from "@/components/sponsor/AdSlot";
 import { usePosts } from "@/hooks/useActivityClubPostData";
-import { MessageCircle, Plus, Tag, Search, Gift } from "lucide-react";
+import { MessageCircle, Plus, Tag, Search, Gift, Heart } from "lucide-react";
 
 export default function Posts() {
   const { communityId } = useCommunity();
@@ -14,12 +15,14 @@ export default function Posts() {
 
   const displayPosts = hasData
     ? apiPosts.map((p: any) => ({
-        id: p.id,
+        id: p._id,
         title: p.title || "Community Post",
         body: p.body || "",
         author: (p.user_profiles as any)?.name || "Resident",
         type: p.type || "discussion",
         time: p.created_at ? new Date(p.created_at).toLocaleDateString() : "Today",
+        likeCount: p.likeCount || 0,
+        commentCount: p.commentCount || 0,
       }))
     : [
         { id: "p1", title: "Anyone have a spare cricket bat?", body: "My kids want to start playing cricket in the evenings.", author: "Rajesh K.", type: "discussion", time: "2h ago" },
@@ -41,7 +44,7 @@ export default function Posts() {
       <Reveal>
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground tracking-[-0.02em]">
+            <h1 className="text-2xl sm:text-3xl font-[Bricolage_Grotesque] font-extrabold text-foreground tracking-[-0.02em]">
               Community Posts
             </h1>
             <p className="text-muted-foreground mt-1">Conversations, buy/sell, and lost & found.</p>
@@ -53,6 +56,9 @@ export default function Posts() {
           </Button>
         </div>
       </Reveal>
+
+      {/* Ad placement */}
+      <AdSlot placement="posts_list" variant="banner" label="Sponsored" />
 
       <div className="space-y-3">
         {displayPosts.map((post: any, i: number) => (
@@ -72,7 +78,17 @@ export default function Posts() {
                       </div>
                       <h3 className="font-semibold text-foreground text-sm mb-1">{post.title}</h3>
                       {post.body && <p className="text-xs text-muted-foreground line-clamp-2">{post.body}</p>}
-                      <p className="text-[10px] text-muted-foreground mt-2">by {post.author} · {post.time}</p>
+                      <div className="flex items-center gap-3 mt-2">
+                        <p className="text-[10px] text-muted-foreground">by {post.author} · {post.time}</p>
+                        <div className="flex items-center gap-2 ml-auto">
+                          {post.likeCount > 0 && (
+                            <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground"><Heart className="w-3 h-3 fill-red-400 text-red-400" />{post.likeCount}</span>
+                          )}
+                          {post.commentCount > 0 && (
+                            <span className="flex items-center gap-0.5 text-[10px] text-muted-foreground"><MessageCircle className="w-3 h-3" />{post.commentCount}</span>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </CardContent>

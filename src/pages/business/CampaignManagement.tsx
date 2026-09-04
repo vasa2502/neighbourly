@@ -14,11 +14,6 @@ const statusColors: Record<string, string> = {
   paused: "bg-red-50 text-red-600",
 };
 
-const demoCampaigns = [
-  { id: "demo-c1", name: "Summer Fitness Promo", community_name: "Green Valley", slot_name: "Community Banner", status: "active", budget: 120, impressions: 2340, clicks: 186, leads: 24, start_date: "2026-08-01", end_date: "2026-08-31", ad_slots: { name: "Community Banner", communities: { name: "Green Valley" } } },
-  { id: "demo-c2", name: "New Restaurant Launch", community_name: "Sunrise Heights", slot_name: "Newsletter Feature", status: "scheduled", budget: 85, impressions: 0, clicks: 0, leads: 0, start_date: "2026-09-01", end_date: "2026-09-30", ad_slots: { name: "Newsletter Feature", communities: { name: "Sunrise Heights" } } },
-  { id: "demo-c3", name: "Back to School Offer", community_name: "Oak Park", slot_name: "Activity Sponsor", status: "completed", budget: 200, impressions: 5120, clicks: 412, leads: 67, start_date: "2026-07-01", end_date: "2026-07-31", ad_slots: { name: "Activity Sponsor", communities: { name: "Oak Park" } } },
-];
 
 export default function CampaignManagement() {
   const { data: realCampaigns = [], isLoading } = useCampaigns();
@@ -26,7 +21,7 @@ export default function CampaignManagement() {
   const [showCreate, setShowCreate] = useState(false);
   const [form, setForm] = useState({ name: "", community_id: "", slot_id: "", budget: "", start_date: "", end_date: "" });
 
-  const displayCampaigns = realCampaigns.length > 0 ? realCampaigns : demoCampaigns;
+  const displayCampaigns = realCampaigns;
 
   const totalStats = displayCampaigns.reduce(
     (acc: any, c: any) => ({
@@ -70,7 +65,7 @@ export default function CampaignManagement() {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-24 lg:pb-8 pt-4 lg:pt-6">
       <Reveal>
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground">Campaigns</h1>
+          <h1 className="text-2xl font-[Bricolage_Grotesque] font-extrabold text-foreground">Campaigns</h1>
           <Button onClick={() => setShowCreate(!showCreate)} className="bg-[hsl(38,65%,42%)] text-white hover:bg-[hsl(38,65%,36%)] text-sm font-semibold rounded-full" size="sm">
             {showCreate ? <X className="w-4 h-4 mr-1" /> : <Plus className="w-4 h-4 mr-1" />}
             {showCreate ? "Cancel" : "New Campaign"}
@@ -129,11 +124,11 @@ export default function CampaignManagement() {
             const ctr = impressions > 0 ? ((clicks / impressions) * 100).toFixed(1) : "0";
 
             return (
-              <Reveal key={c.id || i} delay={i * 0.05}>
+              <Reveal key={c._id || i} delay={i * 0.05}>
                 <Card className="border-border/40 shadow-sm rounded-2xl hover:shadow-md transition-all cursor-pointer">
                   <CardContent className="p-5">
                     <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-[Plus_Jakarta_Sans] font-bold text-foreground text-sm">{name}</h3>
+                      <h3 className="font-[Bricolage_Grotesque] font-bold text-foreground text-sm">{name}</h3>
                       <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full capitalize ${statusColors[status] || statusColors.active}`}>{status}</span>
                     </div>
                     <p className="text-xs text-muted-foreground mb-3">{community} · {slot} · {dates}</p>

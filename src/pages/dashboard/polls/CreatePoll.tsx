@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Reveal } from "@/components/motion/Reveal";
 import { ArrowLeft, Plus, X } from "lucide-react";
-import { useCreatePoll } from "@/hooks/useActivityClubPostData";
+import { useCreatePoll } from "@/hooks/useMessagingData";
 import { useCommunity } from "@/contexts/CommunityContext";
 
 export default function CreatePoll() {
@@ -35,7 +35,7 @@ export default function CreatePoll() {
     <div className="max-w-2xl mx-auto px-4 pb-24 lg:pb-8 pt-4 lg:pt-6">
       <Reveal>
         <Link to="/dashboard/polls" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6"><ArrowLeft className="w-4 h-4" /> Back</Link>
-        <h1 className="text-2xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-6">Create Poll</h1>
+        <h1 className="text-2xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-6">Create Poll</h1>
       </Reveal>
 
       <Reveal delay={0.05}>

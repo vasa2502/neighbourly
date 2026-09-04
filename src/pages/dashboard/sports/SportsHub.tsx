@@ -22,7 +22,7 @@ export default function SportsHub() {
   return (
     <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-24 lg:pb-8 pt-4 lg:pt-6">
       <Reveal>
-        <h1 className="text-2xl sm:text-3xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-6 flex items-center gap-3"><Trophy className="w-7 h-7 text-[hsl(155,45%,32%)]" /> Sports Hub</h1>
+        <h1 className="text-2xl sm:text-3xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-6 flex items-center gap-3"><Trophy className="w-7 h-7 text-[hsl(155,45%,32%)]" /> Sports Hub</h1>
       </Reveal>
 
       {mySports.length > 0 && (
@@ -30,7 +30,7 @@ export default function SportsHub() {
           <section className="mb-8">
             <h2 className="font-semibold text-foreground mb-3 flex items-center gap-2"><Star className="w-4 h-4 text-[hsl(155,45%,32%)]" /> My Sports</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {mySports.map((s: string) => (<Card key={s} className="border-border/40 shadow-sm rounded-xl"><CardContent className="p-4"><p className="font-semibold text-sm text-foreground">{s}</p></CardContent></Card>))}
+              {mySports.map((s: any) => (<Card key={s.name || s} className="border-border/40 shadow-sm rounded-xl"><CardContent className="p-4"><p className="font-semibold text-sm text-foreground">{typeof s === 'string' ? s : s.name}</p></CardContent></Card>))}
             </div>
           </section>
         </Reveal>
@@ -42,7 +42,7 @@ export default function SportsHub() {
           <div className="space-y-3">
             {availableGames.length === 0 && <p className="text-muted-foreground text-sm">No upcoming games.</p>}
             {availableGames.map((g: any) => (
-              <Link key={g.id} to={`/dashboard/activities/${g.id}`}>
+              <Link key={g._id} to={`/dashboard/activities/${g._id}`}>
                 <Card className="border-border/40 shadow-sm rounded-xl hover:shadow-md transition-all cursor-pointer">
                   <CardContent className="p-4 flex items-center justify-between">
                     <div><p className="font-semibold text-sm text-foreground">{g.title}</p><p className="text-xs text-muted-foreground">{g.date} · {g.location || "Community"}</p></div>
@@ -61,7 +61,7 @@ export default function SportsHub() {
           <div className="space-y-3">
             {lookingForPlayers.length === 0 && <p className="text-muted-foreground text-sm">No open requests.</p>}
             {lookingForPlayers.map((g: any) => (
-              <Link key={g.id} to={`/dashboard/activities/${g.id}`}>
+              <Link key={g._id} to={`/dashboard/activities/${g._id}`}>
                 <Card className="border-border/40 shadow-sm rounded-xl hover:shadow-md transition-all cursor-pointer">
                   <CardContent className="p-4 flex items-center justify-between">
                     <div><p className="font-semibold text-sm text-foreground">{g.title}</p><p className="text-xs text-muted-foreground">{g.date}</p></div>

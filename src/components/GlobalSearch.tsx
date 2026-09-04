@@ -112,8 +112,8 @@ export function GlobalSearch({ open, onOpenChange, communityId }: GlobalSearchPr
                     </div>
                     {items.map((item: any) => (
                       <button
-                        key={item.id}
-                        onClick={() => handleSelect(section, item.id)}
+                        key={item._id}
+                        onClick={() => handleSelect(section, item._id)}
                         className="w-full px-4 py-2.5 flex items-center gap-3 hover:bg-accent/50 transition-colors text-left"
                       >
                         <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">

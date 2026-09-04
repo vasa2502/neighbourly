@@ -27,7 +27,7 @@ export default function ManageActivity() {
   const handleCancel = async () => {
     if (!id) return;
     if (confirm("Are you sure you want to cancel this activity?")) {
-      await deleteActivity.mutateAsync(id);
+      await deleteActivity.mutateAsync({ activityId: id });
       navigate("/dashboard/activities");
     }
   };
@@ -38,7 +38,7 @@ export default function ManageActivity() {
         <Link to={`/dashboard/activities/${id}`} className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6">
           <ArrowLeft className="w-4 h-4" /> Back to Activity
         </Link>
-        <h1 className="text-2xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-4">Manage: {title}</h1>
+        <h1 className="text-2xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-4">Manage: {title}</h1>
       </Reveal>
 
       <Reveal delay={0.05}>

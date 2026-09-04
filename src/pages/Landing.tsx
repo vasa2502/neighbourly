@@ -312,7 +312,7 @@ function FAQItem({ q, a }: { q: string; a: string }) {
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between py-5 text-left group"
       >
-        <span className="font-[Plus_Jakarta_Sans] font-semibold text-foreground pr-4 group-hover:text-[hsl(155,45%,32%)] transition-colors">
+        <span className="font-[Bricolage_Grotesque] font-semibold text-foreground pr-4 group-hover:text-[hsl(155,45%,32%)] transition-colors">
           {q}
         </span>
         {open ? (
@@ -400,7 +400,7 @@ function DemoSteps() {
                   <p className="text-xs font-bold text-[hsl(155,45%,32%)] tracking-[0.15em] uppercase mb-2">
                     Step {activeStep + 1} of {demoSteps.length}
                   </p>
-                  <h3 className="text-2xl lg:text-3xl font-[Plus_Jakarta_Sans] font-extrabold text-[hsl(155,35%,18%)] mb-3">
+                  <h3 className="text-2xl lg:text-3xl font-[Bricolage_Grotesque] font-extrabold text-[hsl(155,35%,18%)] mb-3">
                     {demoSteps[activeStep].title}
                   </h3>
                   <p className="text-[hsl(155,10%,45%)] text-base max-w-md">
@@ -602,7 +602,7 @@ const Landing = () => {
             </Reveal>
 
             <Reveal delay={0.2}>
-              <h1 className="text-5xl sm:text-6xl lg:text-[72px] font-[Plus_Jakarta_Sans] font-extrabold tracking-[-0.03em] leading-[0.95] text-foreground mb-6">
+              <h1 className="text-5xl sm:text-6xl lg:text-[72px] font-[Bricolage_Grotesque] font-extrabold tracking-[-0.03em] leading-[0.95] text-foreground mb-6">
                 Where you live,{" "}
                 <span className="inline-block relative">
                   <AnimatePresence mode="wait">
@@ -703,7 +703,7 @@ const Landing = () => {
               <span className="inline-block text-[11px] font-bold tracking-[0.2em] uppercase text-[hsl(155,45%,32%)] mb-4">
                 Interactive Demo
               </span>
-              <h2 className="text-3xl sm:text-4xl font-[Plus_Jakarta_Sans] font-extrabold mb-4 text-foreground tracking-[-0.02em]">
+              <h2 className="text-3xl sm:text-4xl font-[Bricolage_Grotesque] font-extrabold mb-4 text-foreground tracking-[-0.02em]">
                 See How JOINN Works
               </h2>
               <p className="text-muted-foreground text-lg max-w-xl mx-auto">
@@ -730,7 +730,7 @@ const Landing = () => {
                         <Icon className={`w-12 h-12 ${feature.iconColor}`} />
                       </div>
                       <div className="p-6">
-                        <h3 className="font-[Plus_Jakarta_Sans] font-bold text-lg text-foreground mb-2">
+                        <h3 className="font-[Bricolage_Grotesque] font-bold text-lg text-foreground mb-2">
                           {feature.title}
                         </h3>
                         <p className="text-sm text-muted-foreground leading-relaxed">
@@ -754,7 +754,7 @@ const Landing = () => {
               <span className="inline-block text-[11px] font-bold tracking-[0.2em] uppercase text-[hsl(155,45%,32%)] mb-4">
                 Simple Process
               </span>
-              <h2 className="text-4xl sm:text-5xl font-[Plus_Jakarta_Sans] font-extrabold mb-5 text-foreground tracking-[-0.03em] leading-[1.02]">
+              <h2 className="text-4xl sm:text-5xl font-[Bricolage_Grotesque] font-extrabold mb-5 text-foreground tracking-[-0.03em] leading-[1.02]">
                 From sign-up to
                 <br />
                 community in minutes
@@ -778,7 +778,7 @@ const Landing = () => {
                     <div className="absolute top-0 right-0 w-7 h-7 rounded-full bg-foreground text-background text-xs font-bold flex items-center justify-center -translate-y-1 translate-x-1">
                       {step.step}
                     </div>
-                    <h3 className="font-[Plus_Jakarta_Sans] font-bold text-lg text-foreground mb-2">
+                    <h3 className="font-[Bricolage_Grotesque] font-bold text-lg text-foreground mb-2">
                       {step.title}
                     </h3>
                     <p className="text-sm text-muted-foreground leading-relaxed">
@@ -804,7 +804,7 @@ const Landing = () => {
                 <span className="inline-block text-[11px] font-bold tracking-[0.2em] uppercase text-[hsl(155,45%,32%)] mb-4">
                   Trust & Safety
                 </span>
-                <h2 className="text-4xl sm:text-5xl font-[Plus_Jakarta_Sans] font-extrabold mb-5 text-foreground tracking-[-0.03em] leading-[1.05]">
+                <h2 className="text-4xl sm:text-5xl font-[Bricolage_Grotesque] font-extrabold mb-5 text-foreground tracking-[-0.03em] leading-[1.05]">
                   Only real neighbours.
                   <br />
                   Always verified.
@@ -839,7 +839,7 @@ const Landing = () => {
                       <Shield className="w-7 h-7 text-white" />
                     </div>
                     <div>
-                      <p className="font-[Plus_Jakarta_Sans] font-bold text-foreground">
+                      <p className="font-[Bricolage_Grotesque] font-bold text-foreground">
                         Verified Resident
                       </p>
                       <p className="text-sm text-muted-foreground">
@@ -876,7 +876,7 @@ const Landing = () => {
               <div className="order-2 lg:order-1 relative">
                 <div className="absolute -inset-4 bg-[hsl(210,50%,92%)] rounded-3xl rotate-2" />
                 <div className="relative bg-white rounded-2xl shadow-lg p-8 border border-border/40">
-                  <p className="font-[Plus_Jakarta_Sans] font-bold text-foreground mb-4">
+                  <p className="font-[Bricolage_Grotesque] font-bold text-foreground mb-4">
                     Privacy Controls
                   </p>
                   <div className="space-y-3">
@@ -902,7 +902,7 @@ const Landing = () => {
                 <span className="inline-block text-[11px] font-bold tracking-[0.2em] uppercase text-[hsl(155,45%,32%)] mb-4">
                   Your Data, Your Rules
                 </span>
-                <h2 className="text-4xl sm:text-5xl font-[Plus_Jakarta_Sans] font-extrabold mb-5 text-foreground tracking-[-0.03em] leading-[1.05]">
+                <h2 className="text-4xl sm:text-5xl font-[Bricolage_Grotesque] font-extrabold mb-5 text-foreground tracking-[-0.03em] leading-[1.05]">
                   Privacy is built in,
                   <br />
                   not bolted on.
@@ -931,7 +931,7 @@ const Landing = () => {
               <span className="inline-block text-[11px] font-bold tracking-[0.2em] uppercase text-[hsl(155,45%,32%)] mb-4">
                 What's Happening
               </span>
-              <h2 className="text-4xl sm:text-5xl font-[Plus_Jakarta_Sans] font-extrabold mb-5 text-foreground tracking-[-0.03em] leading-[1.02]">
+              <h2 className="text-4xl sm:text-5xl font-[Bricolage_Grotesque] font-extrabold mb-5 text-foreground tracking-[-0.03em] leading-[1.02]">
                 Activities happening
                 <br />
                 in real communities
@@ -954,7 +954,7 @@ const Landing = () => {
                       <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[hsl(155,45%,32%)]">
                         {activity.category}
                       </span>
-                      <h3 className="font-[Plus_Jakarta_Sans] font-bold text-foreground mt-1 mb-1">
+                      <h3 className="font-[Bricolage_Grotesque] font-bold text-foreground mt-1 mb-1">
                         {activity.title}
                       </h3>
                       <p className="text-xs text-muted-foreground">{activity.time}</p>
@@ -979,7 +979,7 @@ const Landing = () => {
               <span className="inline-block text-[11px] font-bold tracking-[0.2em] uppercase text-[hsl(155,45%,32%)] mb-4">
                 Community Clubs
               </span>
-              <h2 className="text-4xl sm:text-5xl font-[Plus_Jakarta_Sans] font-extrabold mb-5 text-foreground tracking-[-0.03em] leading-[1.02]">
+              <h2 className="text-4xl sm:text-5xl font-[Bricolage_Grotesque] font-extrabold mb-5 text-foreground tracking-[-0.03em] leading-[1.02]">
                 Find your people.
                 <br />
                 Start a club.
@@ -999,7 +999,7 @@ const Landing = () => {
                       <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground">
                         {club.category}
                       </span>
-                      <h3 className="font-[Plus_Jakarta_Sans] font-bold text-xl text-foreground mt-1 mb-2">
+                      <h3 className="font-[Bricolage_Grotesque] font-bold text-xl text-foreground mt-1 mb-2">
                         {club.name}
                       </h3>
                       <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -1030,7 +1030,7 @@ const Landing = () => {
                 <span className="inline-block text-[11px] font-bold tracking-[0.2em] uppercase text-[hsl(155,45%,32%)] mb-4">
                   Community Conversation
                 </span>
-                <h2 className="text-4xl sm:text-5xl font-[Plus_Jakarta_Sans] font-extrabold mb-5 text-foreground tracking-[-0.03em] leading-[1.05]">
+                <h2 className="text-4xl sm:text-5xl font-[Bricolage_Grotesque] font-extrabold mb-5 text-foreground tracking-[-0.03em] leading-[1.05]">
                   More than a feed.
                   <br />
                   Real conversations.
@@ -1062,7 +1062,7 @@ const Landing = () => {
                       </span>
                       <span className="text-[11px] text-muted-foreground">{post.time}</span>
                     </div>
-                    <p className="font-[Plus_Jakarta_Sans] font-semibold text-foreground mb-1">
+                    <p className="font-[Bricolage_Grotesque] font-semibold text-foreground mb-1">
                       {post.title}
                     </p>
                     <div className="flex items-center gap-3 text-xs text-muted-foreground">
@@ -1093,7 +1093,7 @@ const Landing = () => {
                     <div className="w-10 h-10 rounded-xl bg-[hsl(155,45%,32%)] flex items-center justify-center">
                       <Building2 className="w-5 h-5 text-white" />
                     </div>
-                    <p className="font-[Plus_Jakarta_Sans] font-bold text-foreground">
+                    <p className="font-[Bricolage_Grotesque] font-bold text-foreground">
                       Admin Dashboard
                     </p>
                   </div>
@@ -1133,7 +1133,7 @@ const Landing = () => {
                 <span className="inline-block text-[11px] font-bold tracking-[0.2em] uppercase text-[hsl(155,45%,32%)] mb-4">
                   For Community Admins
                 </span>
-                <h2 className="text-4xl sm:text-5xl font-[Plus_Jakarta_Sans] font-extrabold mb-5 text-foreground tracking-[-0.03em] leading-[1.05]">
+                <h2 className="text-4xl sm:text-5xl font-[Bricolage_Grotesque] font-extrabold mb-5 text-foreground tracking-[-0.03em] leading-[1.05]">
                   Manage your community
                   <br />
                   with confidence.
@@ -1172,7 +1172,7 @@ const Landing = () => {
                 <span className="inline-block text-[11px] font-bold tracking-[0.2em] uppercase text-[hsl(38,65%,42%)] mb-4">
                   For Businesses
                 </span>
-                <h2 className="text-4xl sm:text-5xl font-[Plus_Jakarta_Sans] font-extrabold mb-5 text-foreground tracking-[-0.03em] leading-[1.05]">
+                <h2 className="text-4xl sm:text-5xl font-[Bricolage_Grotesque] font-extrabold mb-5 text-foreground tracking-[-0.03em] leading-[1.05]">
                   Reach verified residents
                   <br />
                   in specific communities.
@@ -1215,7 +1215,7 @@ const Landing = () => {
                 <div className="relative bg-white rounded-2xl shadow-lg p-8 border border-border/40">
                   <div className="flex items-center gap-3 mb-6">
                     <Megaphone className="w-6 h-6 text-[hsl(38,65%,42%)]" />
-                    <p className="font-[Plus_Jakarta_Sans] font-bold text-foreground">
+                    <p className="font-[Bricolage_Grotesque] font-bold text-foreground">
                       Ad Marketplace
                     </p>
                   </div>
@@ -1258,7 +1258,7 @@ const Landing = () => {
               <span className="inline-block text-[11px] font-bold tracking-[0.2em] uppercase text-[hsl(155,45%,32%)] mb-4">
                 Simple Pricing
               </span>
-              <h2 className="text-4xl sm:text-5xl font-[Plus_Jakarta_Sans] font-extrabold mb-5 text-foreground tracking-[-0.03em] leading-[1.02]">
+              <h2 className="text-4xl sm:text-5xl font-[Bricolage_Grotesque] font-extrabold mb-5 text-foreground tracking-[-0.03em] leading-[1.02]">
                 Simple, transparent pricing
               </h2>
             </div>
@@ -1278,14 +1278,14 @@ const Landing = () => {
                         Most Popular
                       </span>
                     )}
-                    <h3 className="font-[Plus_Jakarta_Sans] font-bold text-xl text-foreground mb-1">
+                    <h3 className="font-[Bricolage_Grotesque] font-bold text-xl text-foreground mb-1">
                       {plan.name}
                     </h3>
                     <p className="text-sm text-muted-foreground mb-4">
                       {plan.description}
                     </p>
                     <div className="mb-6">
-                      <span className="text-4xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground">
+                      <span className="text-4xl font-[Bricolage_Grotesque] font-extrabold text-foreground">
                         {plan.price}
                       </span>
                       {plan.period && (
@@ -1328,7 +1328,7 @@ const Landing = () => {
                   <span className="inline-block text-[11px] font-bold tracking-[0.2em] uppercase text-[hsl(210,55%,42%)] mb-3">
                     For Businesses
                   </span>
-                  <h2 className="text-3xl sm:text-4xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground tracking-[-0.02em] mb-4">
+                  <h2 className="text-3xl sm:text-4xl font-[Bricolage_Grotesque] font-extrabold text-foreground tracking-[-0.02em] mb-4">
                     Reach residents where they live
                   </h2>
                   <p className="text-muted-foreground mb-6 leading-relaxed">
@@ -1372,7 +1372,7 @@ const Landing = () => {
               <span className="inline-block text-[11px] font-bold tracking-[0.2em] uppercase text-[hsl(155,45%,32%)] mb-4">
                 FAQ
               </span>
-              <h2 className="text-3xl sm:text-4xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground tracking-[-0.02em]">
+              <h2 className="text-3xl sm:text-4xl font-[Bricolage_Grotesque] font-extrabold text-foreground tracking-[-0.02em]">
                 Frequently asked questions
               </h2>
             </div>
@@ -1391,7 +1391,7 @@ const Landing = () => {
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
           <Reveal>
             <div className="community-gradient rounded-3xl p-12 lg:p-16 text-white">
-              <h2 className="text-3xl sm:text-5xl font-[Plus_Jakarta_Sans] font-extrabold mb-4 tracking-[-0.03em]">
+              <h2 className="text-3xl sm:text-5xl font-[Bricolage_Grotesque] font-extrabold mb-4 tracking-[-0.03em]">
                 Your community is waiting.
               </h2>
               <p className="text-white/80 text-lg mb-8 max-w-lg mx-auto">
@@ -1424,7 +1424,7 @@ const Landing = () => {
               </p>
             </div>
             <div>
-              <h4 className="font-[Plus_Jakarta_Sans] font-bold text-sm text-foreground mb-4">
+              <h4 className="font-[Bricolage_Grotesque] font-bold text-sm text-foreground mb-4">
                 Product
               </h4>
               <div className="space-y-2.5">
@@ -1446,7 +1446,7 @@ const Landing = () => {
               </div>
             </div>
             <div>
-              <h4 className="font-[Plus_Jakarta_Sans] font-bold text-sm text-foreground mb-4">
+              <h4 className="font-[Bricolage_Grotesque] font-bold text-sm text-foreground mb-4">
                 For Communities
               </h4>
               <div className="space-y-2.5">
@@ -1468,12 +1468,12 @@ const Landing = () => {
               </div>
             </div>
             <div>
-              <h4 className="font-[Plus_Jakarta_Sans] font-bold text-sm text-foreground mb-4">
+              <h4 className="font-[Bricolage_Grotesque] font-bold text-sm text-foreground mb-4">
                 For Business
               </h4>
               <div className="space-y-2.5">
                 {([
-                  { label: "Advertise", to: "/business" },
+                  { label: "Sponsor Your Brand", to: "/sponsor" },
                   { label: "Community Partner", to: "/business" },
                   { label: "Campaign Analytics", to: "/business" },
                   { label: "Ad Marketplace", to: "/business" },

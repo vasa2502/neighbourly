@@ -2,9 +2,10 @@ import { useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
+import { ConvexProvider } from "convex/react";
+import { convex } from "@/lib/convex";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CommunityProvider } from "@/contexts/CommunityContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -20,6 +21,7 @@ import FindCommunity from "./pages/FindCommunity";
 import CommunityPreview from "./pages/CommunityPreview";
 import CreateCommunity from "./pages/CreateCommunity";
 import ClaimCommunity from "./pages/ClaimCommunity";
+import Sponsor from "./pages/Sponsor";
 import NotFound from "./pages/NotFound";
 // Onboarding
 import OnboardingVerification from "./pages/onboarding/VerificationMethod";
@@ -102,6 +104,11 @@ import CommunityAnalytics from "./pages/dashboard/admin/CommunityAnalytics";
 // Billing
 import CommunityBilling from "./pages/dashboard/billing/CommunityBilling";
 import CommunityPartner from "./pages/dashboard/billing/CommunityPartner";
+// Sponsorship
+import SponsorCheckout from "./pages/dashboard/sponsor/SponsorCheckout";
+import SponsorDashboard from "./pages/dashboard/sponsor/SponsorDashboard";
+import AdminSponsorships from "./pages/dashboard/admin/AdminSponsorships";
+import SponsorClickRedirect from "./pages/dashboard/sponsor/SponsorClickRedirect";
 // Business
 import BusinessLanding from "./pages/business/BusinessLanding";
 import AdMarketplace from "./pages/business/AdMarketplace";
@@ -113,135 +120,143 @@ import AccessDenied from "./pages/system/AccessDenied";
 import VerificationRequired from "./pages/system/VerificationRequired";
 import GenericError from "./pages/system/GenericError";
 import SuspendedAccount from "./pages/system/SuspendedAccount";
-const queryClient = new QueryClient();
+import NotificationPreferences from "./pages/dashboard/settings/NotificationPreferences";
+
 function ScrollToTop() {
   const { pathname } = useLocation();
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
   return null;
 }
+
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} storageKey="app-theme">
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <ScrollToTop />
-            <SmoothScroll />
-            <Routes>
-              {/* ── Public routes ── */}
-              <Route path="/" element={<Landing />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/find-community" element={<FindCommunity />} />
-              <Route path="/community/:id" element={<CommunityPreview />} />
-              <Route path="/create-community" element={<CreateCommunity />} />
-              <Route path="/claim-community" element={<ClaimCommunity />} />
-              {/* ── Business ── */}
-              <Route path="/business" element={<BusinessLanding />} />
-              {/* ── System pages ── */}
-              <Route path="/access-denied" element={<AccessDenied />} />
-              <Route path="/verification-required" element={<VerificationRequired />} />
-              <Route path="/error" element={<GenericError />} />
-              <Route path="/suspended" element={<SuspendedAccount />} />
-              {/* ── Onboarding ── */}
-              <Route path="/onboarding/verification" element={<ProtectedRoute><OnboardingVerification /></ProtectedRoute>} />
-              <Route path="/onboarding/pending" element={<ProtectedRoute><OnboardingVerificationPending /></ProtectedRoute>} />
-              <Route path="/onboarding/rejected" element={<ProtectedRoute><OnboardingVerificationRejected /></ProtectedRoute>} />
-              <Route path="/onboarding/profile" element={<ProtectedRoute><OnboardingProfile /></ProtectedRoute>} />
-              <Route path="/onboarding/interests" element={<ProtectedRoute><OnboardingInterests /></ProtectedRoute>} />
-              <Route path="/onboarding/sports" element={<ProtectedRoute><OnboardingSports /></ProtectedRoute>} />
-              <Route path="/onboarding/availability" element={<ProtectedRoute><OnboardingAvailability /></ProtectedRoute>} />
-              <Route path="/onboarding/privacy" element={<ProtectedRoute><OnboardingPrivacy /></ProtectedRoute>} />
-              <Route path="/onboarding/complete" element={<ProtectedRoute><OnboardingComplete /></ProtectedRoute>} />
-              {/* ── Dashboard (protected) ── */}
-              <Route path="/dashboard" element={<ProtectedRoute><Navigate to="/dashboard/home" replace /></ProtectedRoute>} />
-              <Route path="/dashboard/*" element={
-                <ProtectedRoute>
-                  <CommunityProvider>
-                  <DashboardLayout>
-                    <Routes>
-                      <Route path="home" element={<ResidentHome />} />
-                      <Route path="discover" element={<Discover />} />
-                      <Route path="activities" element={<Activities />} />
-                      <Route path="activities/create" element={<CreateActivity />} />
-                      <Route path="activities/:id" element={<ActivityDetail />} />
-                      <Route path="activities/:id/join" element={<ActivityJoinConfirmation />} />
-                      <Route path="activities/:id/pending" element={<ActivityJoinPending />} />
-                      <Route path="activities/:id/waitlist" element={<ActivityWaitlist />} />
-                      <Route path="activities/:id/participants" element={<ActivityParticipants />} />
-                      <Route path="activities/:id/chat" element={<ActivityChat />} />
-                      <Route path="activities/:id/manage" element={<ManageActivity />} />
-                      <Route path="activities/:id/feedback" element={<ActivityFeedback />} />
-                      <Route path="clubs" element={<Clubs />} />
-                      <Route path="clubs/create" element={<CreateClub />} />
-                      <Route path="clubs/:id" element={<ClubDetail />} />
-                      <Route path="clubs/:id/members" element={<ClubMembers />} />
-                      <Route path="clubs/:id/activities" element={<ClubDetail />} />
-                      <Route path="clubs/:id/discussion" element={<ClubDetail />} />
-                      <Route path="posts" element={<Posts />} />
-                      <Route path="posts/create" element={<CreatePost />} />
-                      <Route path="posts/giveaway" element={<CreatePost />} />
-                      <Route path="posts/lost-found" element={<CreatePost />} />
-                      <Route path="posts/:id" element={<PostDetail />} />
-                      <Route path="messages" element={<Messages />} />
-                      <Route path="messages/direct" element={<DirectConversation />} />
-                      <Route path="notifications" element={<Notifications />} />
-                      <Route path="growth" element={<CommunityGrowth />} />
-                      <Route path="referrals" element={<Referrals />} />
-                      <Route path="subscription" element={<Subscription />} />
-                      <Route path="settings" element={<SettingsPage />} />
-                      <Route path="settings/privacy" element={<PrivacySettings />} />
-                      <Route path="settings/account" element={<AccountSettings />} />
-                      <Route path="profile" element={<MyProfile />} />
-                      <Route path="profile/edit" element={<EditProfile />} />
-                      <Route path="profile/participation" element={<MyParticipation />} />
-                      <Route path="sports" element={<SportsHub />} />
-                      <Route path="sports/players" element={<PlayerAvailability />} />
-                      <Route path="sports/looking" element={<LookingForPlayers />} />
-                      <Route path="sports/teams" element={<TeamFormation />} />
-                      <Route path="sports/results" element={<GameResults />} />
-                      <Route path="polls" element={<Polls />} />
-                      <Route path="polls/create" element={<CreatePoll />} />
-                      <Route path="polls/:id/results" element={<PollResults />} />
-                      <Route path="calendar" element={<CommunityCalendar />} />
-                      <Route path="community" element={<CommunityInfo />} />
-                      <Route path="community/announcements" element={<Announcements />} />
-                      <Route path="community/announcements/:id" element={<AnnouncementDetail />} />
-                      <Route path="community/documents" element={<Documents />} />
-                      <Route path="community/rules" element={<CommunityRules />} />
-                      <Route path="community/facilities" element={<Facilities />} />
-                      <Route path="community/contacts" element={<EmergencyContacts />} />
-                      <Route path="directory" element={<ResidentDirectory />} />
-                      <Route path="premium" element={<ResidentPlus />} />
-                      <Route path="premium/billing" element={<ResidentPlusBilling />} />
-                      <Route path="host" element={<HostDashboard />} />
-                      <Route path="host/analytics" element={<HostAnalytics />} />
-                      <Route path="host/pro" element={<HostPro />} />
-                      <Route path="admin" element={<RoleGate allowedRoles={["admin"]}><AdminDashboard /></RoleGate>} />
-                      <Route path="admin/residents" element={<RoleGate allowedRoles={["admin"]}><ResidentManagement /></RoleGate>} />
-                      <Route path="admin/verification" element={<RoleGate allowedRoles={["admin"]}><VerificationQueue /></RoleGate>} />
-                      <Route path="admin/activities" element={<RoleGate allowedRoles={["admin"]}><AdminActivityManagement /></RoleGate>} />
-                      <Route path="admin/moderation" element={<RoleGate allowedRoles={["admin", "moderator"]}><ModerationQueue /></RoleGate>} />
-                      <Route path="admin/announcements" element={<RoleGate allowedRoles={["admin"]}><Announcements /></RoleGate>} />
-                      <Route path="admin/analytics" element={<RoleGate allowedRoles={["admin"]}><CommunityAnalytics /></RoleGate>} />
-                      <Route path="billing" element={<CommunityBilling />} />
-                      <Route path="billing/partner" element={<CommunityPartner />} />
-                      <Route path="marketplace" element={<AdMarketplace />} />
-                      <Route path="campaigns" element={<CampaignManagement />} />
-                      <Route path="partner" element={<PartnerDashboard />} />
-                    </Routes>
-                  </DashboardLayout>
-                  </CommunityProvider>
-                </ProtectedRoute>
-              } />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
-    </ThemeProvider>
-  </QueryClientProvider>
+  <ConvexProvider client={convex}>
+  <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false} storageKey="app-theme">
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <ScrollToTop />
+          <SmoothScroll />
+          <Routes>
+            {/* ── Public routes ── */}
+            <Route path="/" element={<Landing />} />
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/find-community" element={<FindCommunity />} />
+            <Route path="/community/:id" element={<CommunityPreview />} />
+            <Route path="/create-community" element={<CreateCommunity />} />
+            <Route path="/claim-community" element={<ClaimCommunity />} />
+            <Route path="/sponsor" element={<Sponsor />} />
+            <Route path="/sponsor/click/:sponsorshipId" element={<SponsorClickRedirect />} />
+            {/* ── Business ── */}
+            <Route path="/business" element={<BusinessLanding />} />
+            {/* ── System pages ── */}
+            <Route path="/access-denied" element={<AccessDenied />} />
+            <Route path="/verification-required" element={<VerificationRequired />} />
+            <Route path="/error" element={<GenericError />} />
+            <Route path="/suspended" element={<SuspendedAccount />} />
+            {/* ── Onboarding ── */}
+            <Route path="/onboarding/verification" element={<ProtectedRoute><OnboardingVerification /></ProtectedRoute>} />
+            <Route path="/onboarding/pending" element={<ProtectedRoute><OnboardingVerificationPending /></ProtectedRoute>} />
+            <Route path="/onboarding/rejected" element={<ProtectedRoute><OnboardingVerificationRejected /></ProtectedRoute>} />
+            <Route path="/onboarding/profile" element={<ProtectedRoute><OnboardingProfile /></ProtectedRoute>} />
+            <Route path="/onboarding/interests" element={<ProtectedRoute><OnboardingInterests /></ProtectedRoute>} />
+            <Route path="/onboarding/sports" element={<ProtectedRoute><OnboardingSports /></ProtectedRoute>} />
+            <Route path="/onboarding/availability" element={<ProtectedRoute><OnboardingAvailability /></ProtectedRoute>} />
+            <Route path="/onboarding/privacy" element={<ProtectedRoute><OnboardingPrivacy /></ProtectedRoute>} />
+            <Route path="/onboarding/complete" element={<ProtectedRoute><OnboardingComplete /></ProtectedRoute>} />
+            {/* ── Dashboard (protected) ── */}
+            <Route path="/dashboard" element={<ProtectedRoute><Navigate to="/dashboard/home" replace /></ProtectedRoute>} />
+            <Route path="/dashboard/*" element={
+              <ProtectedRoute>
+                <CommunityProvider>
+                <DashboardLayout>
+                  <Routes>
+                    <Route path="home" element={<ResidentHome />} />
+                    <Route path="discover" element={<Discover />} />
+                    <Route path="activities" element={<Activities />} />
+                    <Route path="activities/create" element={<CreateActivity />} />
+                    <Route path="activities/:id" element={<ActivityDetail />} />
+                    <Route path="activities/:id/join" element={<ActivityJoinConfirmation />} />
+                    <Route path="activities/:id/pending" element={<ActivityJoinPending />} />
+                    <Route path="activities/:id/waitlist" element={<ActivityWaitlist />} />
+                    <Route path="activities/:id/participants" element={<ActivityParticipants />} />
+                    <Route path="activities/:id/chat" element={<ActivityChat />} />
+                    <Route path="activities/:id/manage" element={<ManageActivity />} />
+                    <Route path="activities/:id/feedback" element={<ActivityFeedback />} />
+                    <Route path="clubs" element={<Clubs />} />
+                    <Route path="clubs/create" element={<CreateClub />} />
+                    <Route path="clubs/:id" element={<ClubDetail />} />
+                    <Route path="clubs/:id/members" element={<ClubMembers />} />
+                    <Route path="clubs/:id/activities" element={<ClubDetail />} />
+                    <Route path="clubs/:id/discussion" element={<ClubDetail />} />
+                    <Route path="posts" element={<Posts />} />
+                    <Route path="posts/create" element={<CreatePost />} />
+                    <Route path="posts/giveaway" element={<CreatePost />} />
+                    <Route path="posts/lost-found" element={<CreatePost />} />
+                    <Route path="posts/:id" element={<PostDetail />} />
+                    <Route path="messages" element={<Messages />} />
+                    <Route path="messages/direct" element={<DirectConversation />} />
+                    <Route path="notifications" element={<Notifications />} />
+                    <Route path="growth" element={<CommunityGrowth />} />
+                    <Route path="referrals" element={<Referrals />} />
+                    <Route path="subscription" element={<Subscription />} />
+                    <Route path="settings" element={<SettingsPage />} />
+                    <Route path="settings/notifications" element={<NotificationPreferences />} />
+                    <Route path="settings/privacy" element={<PrivacySettings />} />
+                    <Route path="settings/account" element={<AccountSettings />} />
+                    <Route path="profile" element={<MyProfile />} />
+                    <Route path="profile/edit" element={<EditProfile />} />
+                    <Route path="profile/participation" element={<MyParticipation />} />
+                    <Route path="sports" element={<SportsHub />} />
+                    <Route path="sports/players" element={<PlayerAvailability />} />
+                    <Route path="sports/looking" element={<LookingForPlayers />} />
+                    <Route path="sports/teams" element={<TeamFormation />} />
+                    <Route path="sports/results" element={<GameResults />} />
+                    <Route path="polls" element={<Polls />} />
+                    <Route path="polls/create" element={<CreatePoll />} />
+                    <Route path="polls/:id/results" element={<PollResults />} />
+                    <Route path="calendar" element={<CommunityCalendar />} />
+                    <Route path="community" element={<CommunityInfo />} />
+                    <Route path="community/announcements" element={<Announcements />} />
+                    <Route path="community/announcements/:id" element={<AnnouncementDetail />} />
+                    <Route path="community/documents" element={<Documents />} />
+                    <Route path="community/rules" element={<CommunityRules />} />
+                    <Route path="community/facilities" element={<Facilities />} />
+                    <Route path="community/contacts" element={<EmergencyContacts />} />
+                    <Route path="directory" element={<ResidentDirectory />} />
+                    <Route path="premium" element={<ResidentPlus />} />
+                    <Route path="premium/billing" element={<ResidentPlusBilling />} />
+                    <Route path="host" element={<HostDashboard />} />
+                    <Route path="host/analytics" element={<HostAnalytics />} />
+                    <Route path="host/pro" element={<HostPro />} />
+                    <Route path="admin" element={<RoleGate allowedRoles={["admin"]}><AdminDashboard /></RoleGate>} />
+                    <Route path="admin/residents" element={<RoleGate allowedRoles={["admin"]}><ResidentManagement /></RoleGate>} />
+                    <Route path="admin/verification" element={<RoleGate allowedRoles={["admin"]}><VerificationQueue /></RoleGate>} />
+                    <Route path="admin/activities" element={<RoleGate allowedRoles={["admin"]}><AdminActivityManagement /></RoleGate>} />
+                    <Route path="admin/moderation" element={<RoleGate allowedRoles={["admin", "moderator"]}><ModerationQueue /></RoleGate>} />
+                    <Route path="admin/sponsorships" element={<RoleGate allowedRoles={["admin"]}><AdminSponsorships /></RoleGate>} />
+                    <Route path="admin/announcements" element={<RoleGate allowedRoles={["admin"]}><Announcements /></RoleGate>} />
+                    <Route path="admin/analytics" element={<RoleGate allowedRoles={["admin"]}><CommunityAnalytics /></RoleGate>} />
+                    <Route path="billing" element={<CommunityBilling />} />
+                    <Route path="billing/partner" element={<CommunityPartner />} />
+                    <Route path="marketplace" element={<AdMarketplace />} />
+                    <Route path="sponsor" element={<ProtectedRoute><SponsorCheckout /></ProtectedRoute>} />
+                    <Route path="sponsor/dashboard" element={<ProtectedRoute><SponsorDashboard /></ProtectedRoute>} />
+                    <Route path="campaigns" element={<CampaignManagement />} />
+                    <Route path="partner" element={<PartnerDashboard />} />
+                  </Routes>
+                </DashboardLayout>
+                </CommunityProvider>
+              </ProtectedRoute>
+            } />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
+  </ThemeProvider>
+  </ConvexProvider>
 );
 export default App;

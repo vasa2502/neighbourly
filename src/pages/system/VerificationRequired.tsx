@@ -11,7 +11,7 @@ export default function VerificationRequired() {
         <Reveal>
           <Logo size="lg" className="justify-center mb-8" />
           <div className="w-16 h-16 rounded-2xl bg-[hsl(38,50%,92%)] flex items-center justify-center mx-auto mb-6"><Shield className="w-8 h-8 text-[hsl(38,65%,42%)]" /></div>
-          <h1 className="text-2xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-2">Verification required</h1>
+          <h1 className="text-2xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-2">Verification required</h1>
           <p className="text-muted-foreground text-sm mb-8">This feature requires verified residency. Please complete your verification to continue.</p>
           <Button className="bg-[hsl(155,45%,32%)] text-white hover:bg-[hsl(155,45%,26%)] font-semibold rounded-full" asChild><Link to="/onboarding/verification">Complete Verification <ArrowRight className="w-4 h-4 ml-2" /></Link></Button>
         </Reveal>

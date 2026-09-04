@@ -1,6 +1,5 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { useSubscription } from "@/hooks/useConvexData";
 import { toast } from "sonner";
 
 // Price IDs — these would come from your Stripe dashboard
@@ -14,9 +13,6 @@ const STRIPE_PRICES = {
 
 const STRIPE_PUBLISHABLE_KEY = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY ?? "";
 
-/**
- * Detects the user's region from browser language for currency display.
- */
 function detectRegion(): string {
   const lang = navigator.language || "en-US";
   if (lang.startsWith("en-IN")) return "IN";
@@ -25,9 +21,6 @@ function detectRegion(): string {
   return "US";
 }
 
-/**
- * Formats USD price to local currency at checkout time.
- */
 export function formatLocalPrice(usdAmount: number, region?: string): string {
   const r = region || detectRegion();
   const rates: Record<string, { symbol: string; rate: number }> = {
@@ -41,126 +34,71 @@ export function formatLocalPrice(usdAmount: number, region?: string): string {
 }
 
 /**
- * Creates a Stripe Checkout session via Supabase Edge Function.
- * Falls back to showing a setup message if Stripe isn't configured.
+ * Checkout session — requires Stripe Edge Functions to be deployed.
+ * Returns a stub that shows a setup message if Stripe is not configured.
  */
 export function useCreateCheckoutSession() {
   const { user } = useAuth();
-  const qc = useQueryClient();
+  const isStripeConfigured = !!STRIPE_PUBLISHABLE_KEY;
 
-  return useMutation({
-    mutationFn: async ({ priceId, tier }: { priceId: string; tier: string }) => {
-      if (!user) throw new Error("Not authenticated");
-
-      // Call Supabase Edge Function to create checkout session
-      const { data, error } = await supabase.functions.invoke("create-stripe-checkout", {
-        body: {
-          price_id: priceId,
-          user_id: user.id,
-          tier,
-          success_url: `${window.location.origin}/dashboard/subscription?success=true`,
-          cancel_url: `${window.location.origin}/dashboard/subscription?canceled=true`,
-        },
-      });
-
-      if (error) throw error;
-      return data as { url: string };
-    },
-    onSuccess: (data) => {
-      if (data?.url) {
-        window.location.href = data.url;
+  return {
+    mutate: ({ priceId, tier }: { priceId: string; tier: string }) => {
+      if (!user) {
+        toast.error("Please sign in first");
+        return;
       }
+      if (!isStripeConfigured) {
+        toast.info("Stripe is not yet configured. Contact the administrator to set up billing.");
+        return;
+      }
+      // When Stripe is configured, this would redirect to a checkout URL
+      toast.info("Stripe checkout is not yet connected. Please configure the Stripe integration.");
     },
-    onError: (err: Error) => {
-      toast.error(err.message || "Could not start checkout. Please ensure Stripe is configured.");
+    mutateAsync: async ({ priceId, tier }: { priceId: string; tier: string }) => {
+      if (!user) throw new Error("Not authenticated");
+      if (!isStripeConfigured) throw new Error("Stripe is not configured");
+      throw new Error("Stripe Edge Functions not deployed yet");
     },
-  });
+    isPending: false,
+  };
 }
 
 /**
- * Manages the current user's subscription status.
+ * Returns the current user's subscription from Convex.
  */
 export function useStripeSubscription() {
-  const { user } = useAuth();
-
-  return useQuery({
-    queryKey: ["stripeSubscription", user?.id],
-    queryFn: async () => {
-      if (!user) return null;
-
-      const { data, error } = await supabase
-        .from("subscriptions" as any)
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-
-      if (error) return null;
-      return data as any;
-    },
-    enabled: !!user,
-  });
+  const { data: subscription, isLoading } = useSubscription();
+  return { data: subscription, isLoading };
 }
 
 /**
- * Manages subscription lifecycle (cancel, update billing cycle).
+ * Manages subscription lifecycle — requires Stripe Edge Functions.
  */
 export function useManageSubscription() {
-  const qc = useQueryClient();
-  const { user } = useAuth();
-
-  return useMutation({
-    mutationFn: async ({ action }: { action: "cancel" | "reactivate" }) => {
-      if (!user) throw new Error("Not authenticated");
-
-      const { data, error } = await supabase.functions.invoke("manage-stripe-subscription", {
-        body: { user_id: user.id, action },
-      });
-
-      if (error) throw error;
-      return data;
+  return {
+    mutate: ({ action }: { action: "cancel" | "reactivate" }) => {
+      toast.info("Subscription management requires Stripe integration. Contact the administrator.");
     },
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["stripeSubscription"] });
-      qc.invalidateQueries({ queryKey: ["subscription"] });
-      toast.success("Subscription updated");
+    mutateAsync: async ({ action }: { action: "cancel" | "reactivate" }) => {
+      throw new Error("Stripe integration not deployed yet");
     },
-    onError: (err: Error) => {
-      toast.error(err.message || "Failed to manage subscription");
-    },
-  });
+    isPending: false,
+  };
 }
 
 /**
- * Creates a billing portal session for managing payment methods and invoices.
+ * Creates a billing portal session — requires Stripe Edge Functions.
  */
 export function useBillingPortal() {
-  const { user } = useAuth();
-
-  return useMutation({
-    mutationFn: async () => {
-      if (!user) throw new Error("Not authenticated");
-
-      const { data, error } = await supabase.functions.invoke("create-stripe-portal", {
-        body: {
-          user_id: user.id,
-          return_url: `${window.location.origin}/dashboard/subscription`,
-        },
-      });
-
-      if (error) throw error;
-      return data as { url: string };
+  return {
+    mutate: () => {
+      toast.info("Billing portal requires Stripe integration. Contact the administrator.");
     },
-    onSuccess: (data) => {
-      if (data?.url) {
-        window.location.href = data.url;
-      }
+    mutateAsync: async () => {
+      throw new Error("Stripe integration not deployed yet");
     },
-    onError: (err: Error) => {
-      toast.error(err.message || "Could not open billing portal");
-    },
-  });
+    isPending: false,
+  };
 }
 
 export { STRIPE_PRICES, STRIPE_PUBLISHABLE_KEY, detectRegion };

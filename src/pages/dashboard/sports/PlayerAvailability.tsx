@@ -100,7 +100,7 @@ export default function PlayerAvailability() {
           <ArrowLeft className="w-4 h-4" /> Back to Sports Hub
         </Link>
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground flex items-center gap-3">
+          <h1 className="text-2xl font-[Bricolage_Grotesque] font-extrabold text-foreground flex items-center gap-3">
             <Users className="w-6 h-6 text-[hsl(155,45%,32%)]" /> Available Players
           </h1>
           <Button onClick={() => setShowSetForm(!showSetForm)} className="bg-[hsl(155,45%,32%)] text-white hover:bg-[hsl(155,45%,26%)] text-sm font-semibold rounded-full" size="sm">
@@ -218,7 +218,7 @@ export default function PlayerAvailability() {
             const timeEnd = p.time_end || "";
             const skill = p.skill_level || "all";
             return (
-              <Reveal key={p.id || i} delay={i * 0.04}>
+              <Reveal key={p._id || i} delay={i * 0.04}>
                 <Card className="border-border/40 shadow-sm rounded-2xl hover:shadow-md transition-all">
                   <CardContent className="p-5">
                     <div className="flex items-center gap-3 mb-3">

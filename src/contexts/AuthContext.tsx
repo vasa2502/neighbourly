@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { Session, User } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, isConfigured } from "@/integrations/supabase/client";
 
 interface AuthContextType {
   session: Session | null;
@@ -24,6 +24,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const initialSessionResolved = useRef(false);
 
   useEffect(() => {
+    // If Supabase is not configured (no env vars), resolve immediately
+    // so the app renders instead of hanging on a blank screen.
+    if (!isConfigured) {
+      setLoading(false);
+      return;
+    }
+
     let mounted = true;
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -40,16 +47,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSession(session);
       initialSessionResolved.current = true;
       setLoading(false);
+    }).catch(() => {
+      // If getSession fails (network error, invalid URL), resolve loading
+      if (!mounted) return;
+      initialSessionResolved.current = true;
+      setLoading(false);
     });
+
+    // Safety timeout: if auth resolution takes > 3s, force resolve
+    const timeout = setTimeout(() => {
+      if (mounted && !initialSessionResolved.current) {
+        initialSessionResolved.current = true;
+        setLoading(false);
+      }
+    }, 3000);
 
     return () => {
       mounted = false;
       subscription.unsubscribe();
+      clearTimeout(timeout);
     };
   }, []);
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    if (isConfigured) {
+      await supabase.auth.signOut();
+    }
     setSession(null);
   };
 

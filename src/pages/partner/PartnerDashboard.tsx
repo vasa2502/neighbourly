@@ -5,30 +5,16 @@ import { Building2, Tag, MessageCircle, Eye, Loader2, TrendingUp, Users, BarChar
 import { Link } from "react-router-dom";
 import { usePartnerStats } from "@/hooks/useActivityClubPostData";
 
-const demoStats = {
-  totalCampaigns: 3,
-  activeCampaigns: 1,
-  totalImpressions: 5310,
-  totalClicks: 598,
-  totalLeads: 91,
-  totalBudget: 405,
-  communityCount: 2,
-  campaigns: [
-    { id: "d1", name: "Summer Fitness Promo", status: "active", impressions: 2340, clicks: 186, leads: 24, budget: 120, community_name: "Green Valley" },
-    { id: "d2", name: "New Restaurant Launch", status: "scheduled", impressions: 0, clicks: 0, leads: 0, budget: 85, community_name: "Sunrise Heights" },
-    { id: "d3", name: "Back to School Offer", status: "completed", impressions: 5120, clicks: 412, leads: 67, budget: 200, community_name: "Oak Park" },
-  ],
-};
 
 export default function PartnerDashboard() {
   const { data: stats, isLoading } = usePartnerStats();
-  const display = stats?.totalCampaigns ? stats : demoStats;
+  const display: any = stats || { totalSlots: 0, activeSlots: 0, totalCampaigns: 0, activeCampaigns: 0, totalImpressions: 0, totalClicks: 0, totalRevenue: 0, communityCount: 0, totalLeads: 0, totalBudget: 0, campaigns: [] };
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-24 lg:pb-8 pt-4 lg:pt-6">
       <Reveal>
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground">Partner Dashboard</h1>
+          <h1 className="text-2xl font-[Bricolage_Grotesque] font-extrabold text-foreground">Partner Dashboard</h1>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" className="rounded-full" asChild><Link to="/dashboard/marketplace">Ad Marketplace</Link></Button>
             <Button size="sm" className="bg-[hsl(38,65%,42%)] text-white hover:bg-[hsl(38,65%,36%)] rounded-full" asChild><Link to="/dashboard/campaigns">Campaigns <ArrowRight className="w-3 h-3 ml-1" /></Link></Button>
@@ -72,7 +58,7 @@ export default function PartnerDashboard() {
               {display.campaigns.map((c: any) => {
                 const statusColor = c.status === "active" ? "bg-[hsl(155,45%,92%)] text-[hsl(155,45%,32%)]" : c.status === "scheduled" ? "bg-[hsl(38,50%,92%)] text-[hsl(38,65%,42%)]" : "bg-muted text-muted-foreground";
                 return (
-                  <Card key={c.id} className="border-border/40 shadow-sm rounded-xl hover:shadow-md transition-all cursor-pointer">
+                  <Card key={c._id} className="border-border/40 shadow-sm rounded-xl hover:shadow-md transition-all cursor-pointer">
                     <CardContent className="p-4 flex items-center gap-4">
                       <div className="w-11 h-11 rounded-xl bg-[hsl(155,45%,92%)] flex items-center justify-center shrink-0">
                         <BarChart3 className="w-5 h-5 text-[hsl(155,45%,32%)]" />

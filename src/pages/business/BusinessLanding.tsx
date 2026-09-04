@@ -24,7 +24,7 @@ export default function BusinessLanding() {
             <div className="inline-flex items-center gap-2 mb-6 bg-[hsl(38,50%,92%)] text-[hsl(38,65%,42%)] px-4 py-1.5 rounded-full text-[11px] font-bold tracking-[0.18em] uppercase">
               <Megaphone className="w-4 h-4" /> For Businesses
             </div>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground tracking-[-0.03em] leading-[1.02] mb-6">
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-[Bricolage_Grotesque] font-extrabold text-foreground tracking-[-0.03em] leading-[1.02] mb-6">
               Reach verified residents<br />in specific communities.
             </h1>
             <p className="text-lg text-muted-foreground max-w-xl mx-auto mb-10">
@@ -53,7 +53,7 @@ export default function BusinessLanding() {
                   <Card className="border-0 shadow-sm rounded-2xl h-full">
                     <CardContent className="p-6">
                       <div className="w-12 h-12 rounded-xl bg-[hsl(38,50%,92%)] flex items-center justify-center mb-4"><Icon className="w-6 h-6 text-[hsl(38,65%,42%)]" /></div>
-                      <h3 className="font-[Plus_Jakarta_Sans] font-bold text-foreground mb-2">{f.title}</h3>
+                      <h3 className="font-[Bricolage_Grotesque] font-bold text-foreground mb-2">{f.title}</h3>
                       <p className="text-sm text-muted-foreground leading-relaxed">{f.description}</p>
                     </CardContent>
                   </Card>

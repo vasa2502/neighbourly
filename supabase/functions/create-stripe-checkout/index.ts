@@ -8,72 +8,96 @@ const corsHeaders = {
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response("ok", { headers: corsHeaders });
   }
 
   try {
     const { price_id, user_id, tier, success_url, cancel_url } = await req.json();
 
-    // Get Stripe secret key from environment
-    const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY");
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY")!;
+
     if (!stripeSecretKey) {
-      throw new Error("Stripe is not configured. Add STRIPE_SECRET_KEY to your Supabase Edge Function secrets.");
+      throw new Error("STRIPE_SECRET_KEY is not configured");
     }
 
     // Get or create Stripe customer
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Check if user already has a Stripe customer ID
-    const { data: profile } = await supabase
-      .from("user_profiles")
-      .select("email, name")
-      .eq("id", user_id)
-      .single();
+    // Check for existing subscription with stripe_customer_id
+    const { data: existingSub } = await supabase
+      .from("subscriptions")
+      .select("stripe_customer_id")
+      .eq("user_id", user_id)
+      .not("stripe_customer_id", "is", null)
+      .limit(1)
+      .maybeSingle();
 
-    if (!profile) throw new Error("User profile not found");
+    let customerId = existingSub?.stripe_customer_id;
 
-    // Create Stripe Checkout Session
-    const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+    if (!customerId) {
+      // Get user email from auth
+      const { data: userData } = await supabase.auth.admin.getUserById(user_id);
+      const email = userData?.user?.email;
+
+      if (!email) throw new Error("User email not found");
+
+      // Create Stripe customer
+      const customerRes = await fetch("https://api.stripe.com/v1/customers", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${stripeSecretKey}`,
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: new URLSearchParams({
+          email,
+          metadata: JSON.stringify({ user_id }),
+        }).toString(),
+      });
+
+      const customer = await customerRes.json();
+      if (customer.error) throw new Error(customer.error.message);
+      customerId = customer.id;
+
+      // Store customer ID
+      await supabase.from("subscriptions").upsert({
+        user_id,
+        stripe_customer_id: customerId,
+        plan_type: "free",
+        status: "inactive",
+      });
+    }
+
+    // Create checkout session
+    const sessionRes = await fetch("https://api.stripe.com/v1/checkout/sessions", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${stripeSecretKey}`,
         "Content-Type": "application/x-www-form-urlencoded",
       },
       body: new URLSearchParams({
-        mode: "subscription",
+        customer: customerId!,
         "line_items[0][price]": price_id,
         "line_items[0][quantity]": "1",
-        customer_email: profile.email,
+        mode: "subscription",
         success_url: success_url || `${req.headers.get("origin")}/dashboard/subscription?success=true`,
         cancel_url: cancel_url || `${req.headers.get("origin")}/dashboard/subscription?canceled=true`,
-        metadata: JSON.stringify({ user_id, tier }),
+        "metadata[user_id]": user_id,
+        "metadata[tier]": tier || "resident_plus",
       }).toString(),
     });
 
-    const session = await response.json();
-
-    if (session.error) {
-      throw new Error(session.error.message);
-    }
-
-    // Store subscription record in Supabase
-    await supabase.from("subscriptions").upsert({
-      user_id,
-      stripe_session_id: session.id,
-      tier,
-      status: "pending",
-      billing_cycle: price_id.includes("annual") ? "annual" : "monthly",
-    }, { onConflict: "user_id,tier" });
+    const session = await sessionRes.json();
+    if (session.error) throw new Error(session.error.message);
 
     return new Response(
-      JSON.stringify({ url: session.url, sessionId: session.id }),
+      JSON.stringify({ url: session.url }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
-  } catch (error: any) {
+  } catch (error) {
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: (error as Error).message }),
       { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

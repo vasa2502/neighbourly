@@ -23,7 +23,7 @@ export default function ActivityWaitlist() {
           <div className="w-16 h-16 rounded-2xl bg-[hsl(210,40%,92%)] flex items-center justify-center mx-auto mb-4">
             <ListOrdered className="w-8 h-8 text-[hsl(210,55%,42%)]" />
           </div>
-          <h1 className="text-2xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-2">You&apos;re on the waitlist</h1>
+          <h1 className="text-2xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-2">You&apos;re on the waitlist</h1>
           <p className="text-muted-foreground text-sm">This activity is at capacity. We&apos;ll notify you if a spot opens up.</p>
         </div>
       </Reveal>

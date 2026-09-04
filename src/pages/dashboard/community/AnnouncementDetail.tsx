@@ -2,7 +2,7 @@ import { Link, useParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Reveal } from "@/components/motion/Reveal";
 import { ArrowLeft, Pin, Clock, Megaphone } from "lucide-react";
-import { useAnnouncementDetail } from "@/hooks/useActivityClubPostData";
+import { useAnnouncementDetail } from "@/hooks/useMessagingData";
 
 export default function AnnouncementDetail() {
   const { id } = useParams();
@@ -30,7 +30,7 @@ export default function AnnouncementDetail() {
               </>}
               {createdAt && <span className="text-[10px] text-muted-foreground flex items-center gap-1"><Clock className="w-3 h-3" />{new Date(createdAt).toLocaleDateString()}</span>}
             </div>
-            <h1 className="text-2xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-2">{title}</h1>
+            <h1 className="text-2xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-2">{title}</h1>
             <div className="flex items-center gap-2 mb-4">
               <div className="w-8 h-8 rounded-full bg-[hsl(155,45%,92%)] flex items-center justify-center"><Megaphone className="w-4 h-4 text-[hsl(155,45%,32%)]" /></div>
               <div><p className="text-xs font-semibold text-foreground">{authorName}</p><p className="text-[10px] text-muted-foreground">Official announcement</p></div>

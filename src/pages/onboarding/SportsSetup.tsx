@@ -63,7 +63,7 @@ export default function OnboardingSports() {
                 </div>
               ))}
             </div>
-            <h1 className="text-2xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-2">Sports & Activities</h1>
+            <h1 className="text-2xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-2">Sports & Activities</h1>
             <p className="text-sm text-muted-foreground">Select sports you play or want to participate in. This is optional.</p>
           </div>
         </Reveal>

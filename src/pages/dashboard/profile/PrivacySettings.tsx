@@ -41,7 +41,7 @@ export default function PrivacySettings() {
     <div className="max-w-2xl mx-auto px-4 pb-24 lg:pb-8 pt-4 lg:pt-6">
       <Reveal>
         <Link to="/dashboard/settings" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground mb-6"><ArrowLeft className="w-4 h-4" /> Back</Link>
-        <h1 className="text-2xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-2">Privacy Settings</h1>
+        <h1 className="text-2xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-2">Privacy Settings</h1>
         <p className="text-sm text-muted-foreground mb-6">Control what other residents can see about you.</p>
       </Reveal>
 

@@ -48,7 +48,7 @@ const ResetPassword = () => {
             <div className="w-14 h-14 rounded-2xl bg-[hsl(155,45%,92%)] flex items-center justify-center mx-auto mb-4">
               <Lock className="w-7 h-7 text-[hsl(155,45%,32%)]" />
             </div>
-            <h1 className="font-[Plus_Jakarta_Sans] text-xl font-bold text-foreground mb-1">
+            <h1 className="font-[Bricolage_Grotesque] text-xl font-bold text-foreground mb-1">
               Set a new password
             </h1>
             <p className="text-sm text-muted-foreground">

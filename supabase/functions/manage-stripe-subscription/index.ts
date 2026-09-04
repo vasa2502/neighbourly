@@ -8,73 +8,73 @@ const corsHeaders = {
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response("ok", { headers: corsHeaders });
   }
 
   try {
-    const { user_id, action } = await req.json();
-    const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY");
-    if (!stripeSecretKey) throw new Error("Stripe not configured");
+    const { user_id, action } = await req.json(); // action: "cancel" | "reactivate"
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY")!;
+
+    if (!stripeSecretKey) throw new Error("STRIPE_SECRET_KEY is not configured");
+
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Find active subscription
+    // Get the active subscription
     const { data: sub } = await supabase
       .from("subscriptions")
-      .select("*")
+      .select("stripe_subscription_id")
       .eq("user_id", user_id)
       .eq("status", "active")
+      .not("stripe_subscription_id", "is", null)
       .limit(1)
-      .single();
+      .maybeSingle();
 
-    if (!sub || !(sub as any).stripe_subscription_id) {
-      throw new Error("No active subscription found");
+    if (!sub?.stripe_subscription_id) {
+      throw new Error("No active Stripe subscription found");
     }
 
+    // Update subscription on Stripe
+    const updateBody: Record<string, string> = {};
     if (action === "cancel") {
-      // Cancel at period end (don't revoke immediately)
-      const response = await fetch(`https://api.stripe.com/v1/subscriptions/${(sub as any).stripe_subscription_id}`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${stripeSecretKey}`,
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: new URLSearchParams({ "cancel_at_period_end": "true" }).toString(),
-      });
-      const result = await response.json();
-      if (result.error) throw new Error(result.error.message);
-
-      await supabase
-        .from("subscriptions")
-        .update({ cancel_at_period_end: true })
-        .eq("id", (sub as any).id);
+      updateBody["cancel_at_period_end"] = "true";
     } else if (action === "reactivate") {
-      const response = await fetch(`https://api.stripe.com/v1/subscriptions/${(sub as any).stripe_subscription_id}`, {
+      updateBody["cancel_at_period_end"] = "false";
+    }
+
+    const stripeRes = await fetch(
+      `https://api.stripe.com/v1/subscriptions/${sub.stripe_subscription_id}`,
+      {
         method: "POST",
         headers: {
           Authorization: `Bearer ${stripeSecretKey}`,
           "Content-Type": "application/x-www-form-urlencoded",
         },
-        body: new URLSearchParams({ "cancel_at_period_end": "false" }).toString(),
-      });
-      const result = await response.json();
-      if (result.error) throw new Error(result.error.message);
+        body: new URLSearchParams(updateBody).toString(),
+      }
+    );
 
-      await supabase
-        .from("subscriptions")
-        .update({ cancel_at_period_end: false })
-        .eq("id", (sub as any).id);
-    }
+    const stripeSub = await stripeRes.json();
+    if (stripeSub.error) throw new Error(stripeSub.error.message);
+
+    // Update local subscription record
+    await supabase
+      .from("subscriptions")
+      .update({
+        cancel_at_period_end: stripeSub.cancel_at_period_end,
+        current_period_end: new Date(stripeSub.current_period_end * 1000).toISOString(),
+      })
+      .eq("stripe_subscription_id", sub.stripe_subscription_id);
 
     return new Response(
-      JSON.stringify({ success: true }),
+      JSON.stringify({ success: true, cancel_at_period_end: stripeSub.cancel_at_period_end }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
-  } catch (error: any) {
+  } catch (error) {
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: (error as Error).message }),
       { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

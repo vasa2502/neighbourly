@@ -8,52 +8,56 @@ const corsHeaders = {
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response("ok", { headers: corsHeaders });
   }
 
   try {
     const { user_id, return_url } = await req.json();
-    const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY");
-    if (!stripeSecretKey) throw new Error("Stripe not configured");
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const stripeSecretKey = Deno.env.get("STRIPE_SECRET_KEY")!;
+
+    if (!stripeSecretKey) throw new Error("STRIPE_SECRET_KEY is not configured");
+
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Find Stripe customer ID from subscriptions
+    // Get Stripe customer ID
     const { data: sub } = await supabase
       .from("subscriptions")
       .select("stripe_customer_id")
       .eq("user_id", user_id)
+      .not("stripe_customer_id", "is", null)
       .limit(1)
-      .single();
+      .maybeSingle();
 
-    const customerId = (sub as any)?.stripe_customer_id;
-    if (!customerId) throw new Error("No Stripe customer found for this user");
+    if (!sub?.stripe_customer_id) {
+      throw new Error("No Stripe customer found");
+    }
 
-    // Create portal session
-    const response = await fetch("https://api.stripe.com/v1/billing_portal/sessions", {
+    // Create billing portal session
+    const portalRes = await fetch("https://api.stripe.com/v1/billing_portal/sessions", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${stripeSecretKey}`,
         "Content-Type": "application/x-www-form-urlencoded",
       },
       body: new URLSearchParams({
-        customer: customerId,
+        customer: sub.stripe_customer_id,
         return_url: return_url || `${req.headers.get("origin")}/dashboard/subscription`,
       }).toString(),
     });
 
-    const session = await response.json();
-    if (session.error) throw new Error(session.error.message);
+    const portal = await portalRes.json();
+    if (portal.error) throw new Error(portal.error.message);
 
     return new Response(
-      JSON.stringify({ url: session.url }),
+      JSON.stringify({ url: portal.url }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
-  } catch (error: any) {
+  } catch (error) {
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: (error as Error).message }),
       { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

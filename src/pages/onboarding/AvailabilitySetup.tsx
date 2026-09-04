@@ -55,7 +55,7 @@ export default function OnboardingAvailability() {
                 </div>
               ))}
             </div>
-            <h1 className="text-2xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-2">When are you available?</h1>
+            <h1 className="text-2xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-2">When are you available?</h1>
             <p className="text-sm text-muted-foreground">Help us recommend activities at times that work for you.</p>
           </div>
         </Reveal>

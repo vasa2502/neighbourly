@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -13,22 +13,51 @@ const buildings = ["Tower A", "Tower B", "Tower C", "Tower D", "Tower E", "Villa
 
 export default function OnboardingProfile() {
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [name, setName] = useState("");
   const [bio, setBio] = useState("");
   const [building, setBuilding] = useState("");
   const [saving, setSaving] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { toast.error("Image must be under 5MB"); return; }
+    setUploading(true);
+    try {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+      const ext = file.name.split('.').pop() || 'jpg';
+      const path = `avatars/${user.id}/${Date.now()}.${ext}`;
+      const { error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(path, file, { contentType: file.type, upsert: true });
+      if (uploadError) throw uploadError;
+      const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(path);
+      if (urlData?.publicUrl) {
+        setAvatarUrl(urlData.publicUrl);
+        toast.success("Avatar uploaded!");
+      }
+    } catch (err: any) {
+      toast.error(err?.message || "Upload failed. You can add a photo later.");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleContinue = async () => {
     if (!name.trim()) { toast.error("Please enter your name"); return; }
     setSaving(true);
     try {
-      const { updateProfile } = await import("@/lib/api");
-      const { useAuth } = await import("@/contexts/AuthContext");
-      // We can't call hooks here, so use supabase directly
       const { supabase } = await import("@/integrations/supabase/client");
+      const { convex } = await import("@/lib/convex");
+      const { api } = await import("../../../convex/_generated/api");
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        await updateProfile(user.id, { name, bio, building } as any);
+        await convex.mutation(api.users.update, { userId: user.id, name, bio, building, avatar: avatarUrl || undefined } as any);
       }
       toast.success("Profile saved!");
       navigate("/onboarding/interests");
@@ -54,7 +83,7 @@ export default function OnboardingProfile() {
                 </div>
               ))}
             </div>
-            <h1 className="text-2xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-2">Set up your profile</h1>
+            <h1 className="text-2xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-2">Set up your profile</h1>
             <p className="text-sm text-muted-foreground">Other residents will see this information. You can control visibility in privacy settings.</p>
           </div>
         </Reveal>
@@ -63,11 +92,31 @@ export default function OnboardingProfile() {
           {/* Avatar upload */}
           <div className="flex justify-center mb-6">
             <div className="relative">
-              <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center">
-                <User className="w-10 h-10 text-muted-foreground" />
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleAvatarUpload}
+              />
+              <div className="w-24 h-24 rounded-full bg-muted flex items-center justify-center overflow-hidden">
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="Avatar" className="w-24 h-24 rounded-full object-cover" />
+                ) : (
+                  <User className="w-10 h-10 text-muted-foreground" />
+                )}
               </div>
-              <button className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-[hsl(155,45%,32%)] text-white flex items-center justify-center shadow-md">
-                <Camera className="w-4 h-4" />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+                className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-[hsl(155,45%,32%)] text-white flex items-center justify-center shadow-md hover:bg-[hsl(155,45%,26%)] transition-colors disabled:opacity-50"
+              >
+                {uploading ? (
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Camera className="w-4 h-4" />
+                )}
               </button>
             </div>
           </div>

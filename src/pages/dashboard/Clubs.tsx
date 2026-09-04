@@ -5,6 +5,7 @@ import { Reveal } from "@/components/motion/Reveal";
 import { useCommunity } from "@/contexts/CommunityContext";
 import { useClubs } from "@/hooks/useActivityClubPostData";
 import { Users, Plus, Trophy, Heart, BookOpen, Gamepad2, Camera } from "lucide-react";
+import { AdSlot } from "@/components/sponsor/AdSlot";
 
 const clubIcons: Record<string, any> = {
   sports: Trophy,
@@ -23,7 +24,7 @@ export default function Clubs() {
 
   const displayClubs = hasData
     ? apiClubs.map((c: any) => ({
-        id: c.id,
+        id: c._id,
         name: c.name,
         members: c.member_count || 0,
         category: c.category || "General",
@@ -43,7 +44,7 @@ export default function Clubs() {
       <Reveal>
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground tracking-[-0.02em]">
+            <h1 className="text-2xl sm:text-3xl font-[Bricolage_Grotesque] font-extrabold text-foreground tracking-[-0.02em]">
               Clubs
             </h1>
             <p className="text-muted-foreground mt-1">Join interest groups in your community.</p>
@@ -56,12 +57,15 @@ export default function Clubs() {
         </div>
       </Reveal>
 
+      {/* Ad placement */}
+      <AdSlot placement="clubs_list" variant="banner" label="Sponsored" />
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {displayClubs.map((club: any, i: number) => {
           const Icon = club.icon;
           return (
-            <Reveal key={club.id} delay={i * 0.05}>
-              <Link to={`/dashboard/clubs/${club.id}`}>
+            <Reveal key={club._id} delay={i * 0.05}>
+              <Link to={`/dashboard/clubs/${club._id}`}>
                 <Card className="border-border/40 shadow-sm hover:shadow-md transition-all rounded-2xl overflow-hidden cursor-pointer group h-full">
                   <CardContent className="p-5">
                     <div className="flex items-center gap-3 mb-3">

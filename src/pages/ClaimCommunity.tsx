@@ -2,13 +2,14 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { useSearchCommunities } from "@/hooks/useCommunityData";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Building2, Shield, CheckCircle, ArrowRight, ArrowLeft, Upload } from "lucide-react";
+import { Building2, Shield, CheckCircle, ArrowRight, ArrowLeft, Upload, Loader2 } from "lucide-react";
 
 type Step = "search" | "verify" | "submit" | "success";
 
@@ -16,6 +17,11 @@ export default function ClaimCommunity() {
   const [step, setStep] = useState<Step>("search");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCommunity, setSelectedCommunity] = useState<any>(null);
+  const { user } = useAuth();
+  const { data: searchResults = [], isLoading: searching } = useSearchCommunities(
+    searchQuery.length >= 2 ? searchQuery : ""
+  );
+
   const [formData, setFormData] = useState({
     organizationName: "",
     role: "",
@@ -25,15 +31,7 @@ export default function ClaimCommunity() {
     message: "",
   });
 
-  const mockCommunities = [
-    { id: "1", name: "Green Valley Residency", area: "Koramangala", city: "Bangalore", type: "Apartment", residents: 342 },
-    { id: "2", name: "Sunrise Heights", area: "Indiranagar", city: "Bangalore", type: "Apartment", residents: 189 },
-  ];
-
-  const filteredCommunities = mockCommunities.filter(c =>
-    c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    c.area.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const communities = searchQuery.length >= 2 ? searchResults : [];
 
   return (
     <div className="min-h-screen bg-[hsl(40,20%,98%)]">
@@ -82,15 +80,21 @@ export default function ClaimCommunity() {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-4 h-12 text-base"
               />
+              {searching && searchQuery.length >= 2 && (
+                <Loader2 className="absolute right-3 top-3 w-5 h-5 animate-spin text-muted-foreground" />
+              )}
             </div>
 
-            {searchQuery && (
+            {searchQuery.length >= 2 && (
               <div className="space-y-3">
-                {filteredCommunities.map((community) => (
+                {communities.map((community: any) => (
                   <Card
-                    key={community.id}
+                    key={community._id}
                     className="cursor-pointer hover:border-[hsl(155,45%,32%)] transition-colors"
-                    onClick={() => setStep("verify")}
+                    onClick={() => {
+                      setSelectedCommunity(community);
+                      setStep("verify");
+                    }}
                   >
                     <CardContent className="p-4 flex items-center justify-between">
                       <div className="flex items-center gap-3">
@@ -99,7 +103,11 @@ export default function ClaimCommunity() {
                         </div>
                         <div>
                           <p className="font-semibold text-[hsl(155,35%,18%)]">{community.name}</p>
-                          <p className="text-sm text-[hsl(155,10%,45%)]">{community.area}, {community.city} · {community.type} · ~{community.residents} residents</p>
+                          <p className="text-sm text-[hsl(155,10%,45%)]">
+                            {[community.area, community.city].filter(Boolean).join(", ")}
+                            {community.type ? ` · ${community.type}` : ""}
+                            {community.resident_count ? ` · ~${community.resident_count} residents` : ""}
+                          </p>
                         </div>
                       </div>
                       <ArrowRight className="w-5 h-5 text-gray-300" />
@@ -107,17 +115,19 @@ export default function ClaimCommunity() {
                   </Card>
                 ))}
 
-                <Card className="border-dashed border-2 border-gray-200 hover:border-[hsl(155,45%,32%)] cursor-pointer transition-colors" onClick={() => setStep("verify")}>
-                  <CardContent className="p-4 flex items-center gap-3">
-                    <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center">
-                      <span className="text-xl">🔍</span>
-                    </div>
-                    <div>
-                      <p className="font-medium text-[hsl(155,35%,18%)]">My community is not listed</p>
-                      <p className="text-sm text-[hsl(155,10%,45%)]">You can still claim it — we'll verify the information</p>
-                    </div>
-                  </CardContent>
-                </Card>
+                {communities.length === 0 && !searching && (
+                  <Card className="border-dashed border-2 border-gray-200 hover:border-[hsl(155,45%,32%)] cursor-pointer transition-colors" onClick={() => setStep("verify")}>
+                    <CardContent className="p-4 flex items-center gap-3">
+                      <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center">
+                        <span className="text-xl">🔍</span>
+                      </div>
+                      <div>
+                        <p className="font-medium text-[hsl(155,35%,18%)]">My community is not listed</p>
+                        <p className="text-sm text-[hsl(155,10%,45%)]">You can still claim it — we'll verify the information</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
               </div>
             )}
           </div>
@@ -136,10 +146,24 @@ export default function ClaimCommunity() {
                 <Shield className="w-5 h-5 text-[hsl(155,45%,32%)] mt-0.5" />
                 <div className="text-sm">
                   <p className="font-medium text-[hsl(155,35%,18%)]">Why is verification required?</p>
-                  <p className="text-[hsl(155,10%,45%)] mt-1">JOINN requires community administrators to verify their authority to prevent unauthorized claims and protect resident privacy. This process ensures that only legitimate representatives gain administrative control.</p>
+                  <p className="text-[hsl(155,10%,45%)] mt-1">JOINN requires community administrators to verify their authority to prevent unauthorized claims and protect resident privacy.</p>
                 </div>
               </CardContent>
             </Card>
+
+            {selectedCommunity && (
+              <Card className="border-[hsl(155,35%,85%)]">
+                <CardContent className="p-4 flex items-center gap-3">
+                  <Building2 className="w-5 h-5 text-[hsl(155,45%,32%)]" />
+                  <div>
+                    <p className="font-medium text-[hsl(155,35%,18%)]">{selectedCommunity.name}</p>
+                    <p className="text-sm text-[hsl(155,10%,45%)]">
+                      {[selectedCommunity.area, selectedCommunity.city].filter(Boolean).join(", ")}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
             <div className="space-y-4">
               <div className="space-y-2">
@@ -206,7 +230,7 @@ export default function ClaimCommunity() {
               <CardContent className="p-5 space-y-4">
                 <div className="flex justify-between">
                   <span className="text-[hsl(155,10%,45%)]">Community</span>
-                  <span className="font-medium text-[hsl(155,35%,18%)]">Green Valley Residency</span>
+                  <span className="font-medium text-[hsl(155,35%,18%)]">{selectedCommunity?.name || "Not selected"}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-[hsl(155,10%,45%)]">Organization</span>
@@ -216,21 +240,18 @@ export default function ClaimCommunity() {
                   <span className="text-[hsl(155,10%,45%)]">Your Role</span>
                   <span className="font-medium text-[hsl(155,35%,18%)]">{formData.role || "N/A"}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-[hsl(155,10%,45%)]">Verification Document</span>
-                  <span className="font-medium text-green-600">Uploaded ✓</span>
-                </div>
               </CardContent>
             </Card>
 
             <Button className="w-full h-12 bg-[hsl(155,45%,32%)] hover:bg-[hsl(155,50%,28%)] text-white" onClick={async () => {
               if (!selectedCommunity) { toast.error("Select a community first"); return; }
+              if (!user) { toast.error("Please sign in"); return; }
               try {
-                const { submitClaim } = await import("@/lib/api");
-                const { supabase } = await import("@/integrations/supabase/client");
-                const { data: { user } } = await supabase.auth.getUser();
-                if (!user) { toast.error("Please sign in"); return; }
-                await submitClaim(user.id, selectedCommunity.id, {
+                const { convex } = await import("@/lib/convex");
+                const { api } = await import("../../convex/_generated/api");
+                await convex.mutation(api.claims.submit, {
+                  communityId: selectedCommunity._id,
+                  claimantId: user.id,
                   organizationName: formData.organizationName,
                   roleTitle: formData.role,
                   evidence: formData.message || formData.email,

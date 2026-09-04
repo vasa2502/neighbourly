@@ -157,7 +157,7 @@ const Auth = () => {
             <div>
               {!forgotSent ? (
                 <>
-                  <h2 className="font-[Plus_Jakarta_Sans] font-bold text-xl text-foreground mb-1">
+                  <h2 className="font-[Bricolage_Grotesque] font-bold text-xl text-foreground mb-1">
                     Reset your password
                   </h2>
                   <p className="text-sm text-muted-foreground mb-6">
@@ -192,7 +192,7 @@ const Auth = () => {
                   <div className="w-14 h-14 rounded-full bg-[hsl(155,45%,92%)] flex items-center justify-center mx-auto mb-4">
                     <Shield className="w-7 h-7 text-[hsl(155,45%,32%)]" />
                   </div>
-                  <h2 className="font-[Plus_Jakarta_Sans] font-bold text-xl text-foreground mb-2">
+                  <h2 className="font-[Bricolage_Grotesque] font-bold text-xl text-foreground mb-2">
                     Check your inbox
                   </h2>
                   <p className="text-sm text-muted-foreground mb-6">

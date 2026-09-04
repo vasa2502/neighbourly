@@ -26,7 +26,7 @@ export default function ResidentPlus() {
           <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[hsl(45,65%,42%)] to-[hsl(38,65%,42%)] flex items-center justify-center mx-auto mb-4 shadow-lg">
             <Crown className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-3xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-2">Resident Plus</h1>
+          <h1 className="text-3xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-2">Resident Plus</h1>
           <p className="text-muted-foreground">Enhanced community experience</p>
           {isActive && <span className="inline-block mt-2 text-xs font-bold bg-[hsl(155,45%,92%)] text-[hsl(155,45%,32%)] px-3 py-1 rounded-full">Active Subscriber</span>}
         </div>
@@ -34,7 +34,7 @@ export default function ResidentPlus() {
 
       <Reveal delay={0.1}>
         <div className="text-center mb-8">
-          <span className="text-5xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground">$6.99</span>
+          <span className="text-5xl font-[Bricolage_Grotesque] font-extrabold text-foreground">$6.99</span>
           <span className="text-muted-foreground text-lg">/month</span>
           <p className="text-xs text-[hsl(155,50%,38%)] mt-1">Save {savings}% with annual billing ($69.90/year)</p>
         </div>

@@ -62,7 +62,7 @@ export default function OnboardingInterests() {
                 </div>
               ))}
             </div>
-            <h1 className="text-2xl font-[Plus_Jakarta_Sans] font-extrabold text-foreground mb-2">What are you interested in?</h1>
+            <h1 className="text-2xl font-[Bricolage_Grotesque] font-extrabold text-foreground mb-2">What are you interested in?</h1>
             <p className="text-sm text-muted-foreground">Select at least 3 interests. This helps us recommend activities and clubs for you.</p>
           </div>
         </Reveal>
